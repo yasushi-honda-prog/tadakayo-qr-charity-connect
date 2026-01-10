@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タダカヨ QRチャリティ・コネクト - 設計ドキュメント</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 16px;
+        }
+        nav {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 8px;
+            padding: 16px 0;
+            overflow-x: auto;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        nav a:hover {
+            background: var(--bg);
+        }
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        section:last-child {
+            border-bottom: none;
+        }
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 24px;
+            color: var(--primary);
+        }
+        h3 {
+            font-size: 1.3rem;
+            margin: 32px 0 16px;
+            color: var(--text);
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .mermaid {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .feature-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .tech-tag {
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-done { background: #d1fae5; color: #065f46; }
+        .status-progress { background: #fef3c7; color: #92400e; }
+        .status-pending { background: #e2e8f0; color: #475569; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--bg);
+            font-weight: 600;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.9em;
+        }
+        .note {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+        }
+        .ai-tip {
+            background: #f0fdf4;
+            border-left: 4px solid var(--secondary);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+        }
+        .ai-tip h4 {
+            color: var(--secondary);
+            margin-bottom: 8px;
+        }
+        footer {
+            background: var(--text);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+        footer a {
+            color: #93c5fd;
+        }
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.5rem; }
+            nav ul { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>タダカヨ QRチャリティ・コネクト</h1>
+            <p>QRコードを起点としたスマートフォン寄付システム</p>
+            <span class="badge">GCP Serverless Architecture</span>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#overview">概要</a></li>
+                <li><a href="#architecture">アーキテクチャ</a></li>
+                <li><a href="#donation-flow">寄付フロー</a></li>
+                <li><a href="#webhook">Webhook処理</a></li>
+                <li><a href="#data-model">データモデル</a></li>
+                <li><a href="#infrastructure">インフラ構成</a></li>
+                <li><a href="#dev-flow">開発フロー</a></li>
+                <li><a href="#roadmap">ロードマップ</a></li>
+                <li><a href="#ai-guide">AI開発ガイド</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <!-- 概要セクション -->
+        <section id="overview">
+            <div class="container">
+                <h2>プロジェクト概要</h2>
+                <p>本システムは、NPO法人タダカヨの活動を支援するための寄付プラットフォームです。チラシ・名刺・イベント投影に印刷されたQRコードをスキャンするだけで、PayPayや楽天ペイを通じてスムーズに寄付を完了できます。</p>
+
+                <div class="grid">
+                    <div class="feature-card">
+                        <h4>簡単な寄付体験</h4>
+                        <p>QRコードをスキャンするだけで寄付画面へ。アプリのインストール不要。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>複数の決済手段</h4>
+                        <p>PayPay、楽天ペイに対応。ユーザーの好みの決済方法を選択可能。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>流入元トラッキング</h4>
+                        <p>チラシ・名刺・イベントごとの効果測定で、マーケティング改善に活用。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>低コスト運用</h4>
+                        <p>GCPサーバーレス構成による従量課金。アクセスがない時は課金ゼロ。</p>
+                    </div>
+                </div>
+
+                <h3>技術スタック</h3>
+                <div class="tech-stack">
+                    <span class="tech-tag">Cloud Run</span>
+                    <span class="tech-tag">Cloud Firestore</span>
+                    <span class="tech-tag">Secret Manager</span>
+                    <span class="tech-tag">Cloud NAT</span>
+                    <span class="tech-tag">Terraform</span>
+                    <span class="tech-tag">Node.js / Python</span>
+                    <span class="tech-tag">PayPay API</span>
+                    <span class="tech-tag">楽天ペイ API</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- アーキテクチャセクション -->
+        <section id="architecture">
+            <div class="container">
+                <h2>システムアーキテクチャ</h2>
+                <p>GCPのサーバーレス製品群を活用し、低コスト・高セキュリティ・高拡張性を実現しています。</p>
+
+                <div class="mermaid">
+graph TB
+    subgraph "Physical World"
+        QR1[チラシ QR]
+        QR2[名刺 QR]
+        QR3[イベント投影 QR]
+    end
+
+    subgraph "User"
+        Phone[スマートフォン]
+    end
+
+    subgraph "GCP: tadakayo-qr-connect"
+        subgraph "Compute"
+            CR[Cloud Run<br/>Backend Service]
+        end
+
+        subgraph "Data"
+            FS[(Firestore<br/>寄付記録)]
+            SM[Secret Manager<br/>APIキー/署名鍵]
+        end
+
+        subgraph "Network"
+            NAT[Cloud NAT<br/>固定IP]
+            VPC[VPC Network]
+        end
+    end
+
+    subgraph "External Payment APIs"
+        PP[PayPay API]
+        RP[楽天ペイ API]
+    end
+
+    QR1 & QR2 & QR3 -->|スキャン| Phone
+    Phone -->|HTTPS| CR
+    CR -->|読み書き| FS
+    CR -->|取得| SM
+    CR --> VPC --> NAT
+    NAT -->|API Call| PP & RP
+    PP & RP -->|Webhook| CR
+                </div>
+
+                <div class="ai-tip">
+                    <h4>AI開発のポイント</h4>
+                    <p>このアーキテクチャ図を参照して、各コンポーネント間の依存関係を把握してください。新機能追加時は、影響を受けるコンポーネントを特定することが重要です。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 寄付フローセクション -->
+        <section id="donation-flow">
+            <div class="container">
+                <h2>寄付フロー（シーケンス図）</h2>
+                <p>ユーザーがQRコードをスキャンしてから寄付が完了するまでの流れです。</p>
+
+                <div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant U as ユーザー
+    participant QR as QRコード
+    participant CR as Cloud Run
+    participant SM as Secret Manager
+    participant FS as Firestore
+    participant PP as PayPay/楽天ペイ
+
+    U->>QR: QRコードをスキャン
+    QR->>CR: GET /donate?source=flyer_001
+    CR->>FS: 流入元を記録
+    CR->>U: 金額選択ページを表示
+    U->>CR: 金額を選択 (例: 1,000円)
+    CR->>SM: APIキーを取得
+    SM-->>CR: APIキー
+    CR->>PP: 決済リクエスト作成
+    PP-->>CR: 決済URL
+    CR->>U: 決済画面へリダイレクト
+    U->>PP: 決済を実行
+    PP-->>U: 決済完了
+    PP->>CR: Webhook通知
+    CR->>SM: 署名検証鍵を取得
+    SM-->>CR: 署名鍵
+    CR->>CR: 署名検証
+    CR->>FS: 決済結果を保存
+    CR->>U: サンクスページを表示
+                </div>
+
+                <div class="note">
+                    <strong>重要:</strong> ステップ14-15の署名検証は必須です。これを省略すると、不正なWebhook通知を受け入れるリスクがあります。
+                </div>
+            </div>
+        </section>
+
+        <!-- Webhook処理セクション -->
+        <section id="webhook">
+            <div class="container">
+                <h2>Webhook処理フロー</h2>
+                <p>決済プロバイダからのWebhook通知を安全に処理するフローです。</p>
+
+                <div class="mermaid">
+flowchart TD
+    A[Webhook受信] --> B{リクエスト検証}
+    B -->|無効| C[400 Bad Request]
+    B -->|有効| D[署名検証]
+    D -->|失敗| E[401 Unauthorized]
+    D -->|成功| F{イベントタイプ判定}
+
+    F -->|payment.completed| G[決済完了処理]
+    F -->|payment.failed| H[決済失敗処理]
+    F -->|payment.refunded| I[返金処理]
+    F -->|unknown| J[ログ記録のみ]
+
+    G --> K[Firestoreに保存]
+    H --> K
+    I --> K
+    J --> L[200 OK]
+    K --> L
+
+    subgraph "セキュリティチェック"
+        B
+        D
+    end
+
+    subgraph "ビジネスロジック"
+        F
+        G
+        H
+        I
+        J
+    end
+                </div>
+
+                <h3>署名検証の実装例</h3>
+                <div class="card">
+                    <code>
+// Node.js での署名検証例<br>
+const crypto = require('crypto');<br><br>
+function verifySignature(payload, signature, secret) {<br>
+&nbsp;&nbsp;const expected = crypto<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.createHmac('sha256', secret)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.update(payload)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.digest('hex');<br>
+&nbsp;&nbsp;return crypto.timingSafeEqual(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Buffer.from(signature),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Buffer.from(expected)<br>
+&nbsp;&nbsp;);<br>
+}
+                    </code>
+                </div>
+
+                <div class="ai-tip">
+                    <h4>AI開発のポイント</h4>
+                    <p>Webhook処理を実装する際は、このフローチャートに従って全てのパスを網羅してください。特に署名検証の失敗ケースとunknownイベントの処理を忘れずに。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- データモデルセクション -->
+        <section id="data-model">
+            <div class="container">
+                <h2>データモデル</h2>
+                <p>Firestore（NoSQL）のコレクション構造です。</p>
+
+                <div class="mermaid">
+erDiagram
+    donations {
+        string id PK "自動生成ID"
+        string source "流入元(flyer_001等)"
+        int amount "寄付金額"
+        string currency "通貨(JPY)"
+        string payment_provider "決済プロバイダ"
+        string payment_id "決済プロバイダのID"
+        string status "pending/completed/failed/refunded"
+        timestamp created_at "作成日時"
+        timestamp updated_at "更新日時"
+    }
+
+    qr_sources {
+        string id PK "QRソースID(flyer_001等)"
+        string name "表示名"
+        string type "flyer/card/event"
+        string description "説明"
+        boolean active "有効フラグ"
+        timestamp created_at "作成日時"
+    }
+
+    webhook_logs {
+        string id PK "自動生成ID"
+        string provider "PayPay/RakutenPay"
+        string event_type "イベントタイプ"
+        string payment_id "関連する決済ID"
+        object raw_payload "生のペイロード"
+        boolean signature_valid "署名検証結果"
+        timestamp received_at "受信日時"
+    }
+
+    donations ||--o{ webhook_logs : "payment_id"
+    qr_sources ||--o{ donations : "source"
+                </div>
+
+                <h3>コレクション詳細</h3>
+                <table>
+                    <tr>
+                        <th>コレクション</th>
+                        <th>用途</th>
+                        <th>インデックス</th>
+                    </tr>
+                    <tr>
+                        <td><code>donations</code></td>
+                        <td>寄付記録の保存</td>
+                        <td>source, status, created_at</td>
+                    </tr>
+                    <tr>
+                        <td><code>qr_sources</code></td>
+                        <td>QRコード流入元の管理</td>
+                        <td>type, active</td>
+                    </tr>
+                    <tr>
+                        <td><code>webhook_logs</code></td>
+                        <td>Webhook通知のログ（監査用）</td>
+                        <td>provider, received_at</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- インフラ構成セクション -->
+        <section id="infrastructure">
+            <div class="container">
+                <h2>インフラ構成（GCP）</h2>
+                <p>Terraformで管理するGCPリソースの構成です。</p>
+
+                <div class="mermaid">
+graph TB
+    subgraph "GCP Project: tadakayo-qr-connect"
+        subgraph "IAM"
+            SA[Service Account<br/>cloud-run-sa]
+        end
+
+        subgraph "Networking"
+            VPC[VPC Network<br/>donation-vpc]
+            SUBNET[Subnet<br/>asia-northeast1]
+            ROUTER[Cloud Router]
+            NAT[Cloud NAT<br/>固定IP: x.x.x.x]
+            VPC --> SUBNET
+            SUBNET --> ROUTER --> NAT
+        end
+
+        subgraph "Serverless"
+            CR[Cloud Run<br/>donation-api]
+            CR -.->|VPC Connector| VPC
+        end
+
+        subgraph "Data & Security"
+            FS[(Firestore<br/>Native Mode)]
+            SM[Secret Manager]
+        end
+
+        subgraph "Observability"
+            LOG[Cloud Logging]
+            MON[Cloud Monitoring]
+            ERR[Error Reporting]
+        end
+
+        SA -->|権限| CR
+        SA -->|権限| FS
+        SA -->|権限| SM
+        CR --> LOG
+        LOG --> MON
+        LOG --> ERR
+    end
+
+    EXT[External<br/>Payment APIs] -->|Webhook| CR
+    NAT -->|API Call| EXT
+                </div>
+
+                <h3>固定IPが必要な理由</h3>
+                <div class="card">
+                    <p>PayPayや楽天ペイのAPIは、セキュリティのため接続元IPアドレスのホワイトリスト登録を求めています。Cloud NATを使用することで、サーバーレス環境でも固定IPからの通信が可能になります。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 開発フローセクション -->
+        <section id="dev-flow">
+            <div class="container">
+                <h2>開発・デプロイフロー</h2>
+                <p>GitHubとGCPを連携したCI/CDフローです。</p>
+
+                <div class="mermaid">
+flowchart LR
+    subgraph "Local Development"
+        DEV[開発者]
+        CODE[コード変更]
+        TEST[ローカルテスト]
+    end
+
+    subgraph "GitHub"
+        PR[Pull Request]
+        REVIEW[コードレビュー]
+        MAIN[main branch]
+    end
+
+    subgraph "CI/CD"
+        CI[GitHub Actions<br/>Lint & Test]
+        BUILD[Docker Build]
+        DEPLOY[Cloud Run Deploy]
+    end
+
+    subgraph "GCP"
+        STG[Staging環境]
+        PROD[Production環境]
+    end
+
+    DEV --> CODE --> TEST --> PR
+    PR --> CI
+    CI -->|Pass| REVIEW
+    CI -->|Fail| DEV
+    REVIEW -->|Approve| MAIN
+    MAIN --> BUILD --> DEPLOY
+    DEPLOY --> STG
+    STG -->|Manual Approval| PROD
+                </div>
+
+                <h3>ブランチ戦略</h3>
+                <div class="mermaid">
+gitGraph
+    commit id: "initial"
+    branch feature/payment-api
+    checkout feature/payment-api
+    commit id: "add PayPay"
+    commit id: "add webhook"
+    checkout main
+    merge feature/payment-api id: "PR #1"
+    branch feature/tracking
+    checkout feature/tracking
+    commit id: "add source tracking"
+    checkout main
+    merge feature/tracking id: "PR #2"
+    commit id: "release v1.0"
+                </div>
+            </div>
+        </section>
+
+        <!-- ロードマップセクション -->
+        <section id="roadmap">
+            <div class="container">
+                <h2>開発ロードマップ</h2>
+
+                <div class="mermaid">
+gantt
+    title タダカヨ QRチャリティ・コネクト 開発計画
+    dateFormat YYYY-MM-DD
+
+    section 第1段階: MVP
+    GCP/GitHub連携設定          :done, a1, 2025-01-10, 1d
+    ネットワーク基盤構築        :a2, after a1, 3d
+    PayPay決済遷移実装          :a3, after a2, 5d
+    Webhook受信実装             :a4, after a3, 3d
+
+    section 第2段階: UX向上
+    金額選択画面                :b1, after a4, 3d
+    サンクスページ              :b2, after b1, 2d
+    流入元トラッキング          :b3, after b2, 3d
+
+    section 第3段階: 本格運用
+    管理画面                    :c1, after b3, 5d
+    楽天ペイ統合                :c2, after c1, 5d
+    継続寄付検討                :c3, after c2, 3d
+                </div>
+
+                <h3>マイルストーン詳細</h3>
+                <table>
+                    <tr>
+                        <th>フェーズ</th>
+                        <th>目標</th>
+                        <th>ステータス</th>
+                    </tr>
+                    <tr>
+                        <td>第1段階: MVP</td>
+                        <td>特定金額でPayPay決済が完了し、記録される</td>
+                        <td><span class="status status-progress">進行中</span></td>
+                    </tr>
+                    <tr>
+                        <td>第2段階: UX向上</td>
+                        <td>金額選択、サンクスページ、効果測定</td>
+                        <td><span class="status status-pending">未着手</span></td>
+                    </tr>
+                    <tr>
+                        <td>第3段階: 本格運用</td>
+                        <td>管理画面、複数決済、継続寄付</td>
+                        <td><span class="status status-pending">未着手</span></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- AI開発ガイドセクション -->
+        <section id="ai-guide">
+            <div class="container">
+                <h2>AI駆動開発ガイド</h2>
+                <p>Claude CodeなどのAIアシスタントと協働する際のガイドラインです。</p>
+
+                <h3>コンテキスト共有用チェックリスト</h3>
+                <div class="card">
+                    <p>AIに作業を依頼する際は、以下の情報を提供してください：</p>
+                    <ul style="margin-top: 12px; padding-left: 24px;">
+                        <li>対象ファイル/コンポーネント</li>
+                        <li>期待する動作（受け入れ条件）</li>
+                        <li>関連するドキュメント（このページのセクション）</li>
+                        <li>制約事項（セキュリティ、パフォーマンス等）</li>
+                    </ul>
+                </div>
+
+                <h3>重要な設計決定（ADR）</h3>
+                <div class="mermaid">
+mindmap
+    root((設計決定))
+        ADR-001
+            Cloud Run採用
+            オートスケーリング
+            従量課金
+        ADR-002
+            Cloud NAT
+            固定IP
+            決済API対応
+        ADR-003
+            Firestore
+            スキーマレス
+            拡張性重視
+                </div>
+
+                <h3>セキュリティチェックリスト</h3>
+                <div class="card">
+                    <table>
+                        <tr>
+                            <th>項目</th>
+                            <th>確認事項</th>
+                        </tr>
+                        <tr>
+                            <td>署名検証</td>
+                            <td>Webhook通知の署名を必ず検証</td>
+                        </tr>
+                        <tr>
+                            <td>シークレット管理</td>
+                            <td>APIキー/署名鍵はSecret Managerで管理</td>
+                        </tr>
+                        <tr>
+                            <td>ログ出力</td>
+                            <td>APIキー、署名鍵、PIIをログに出力しない</td>
+                        </tr>
+                        <tr>
+                            <td>入力検証</td>
+                            <td>金額、source等の入力値を検証</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="ai-tip">
+                    <h4>AIへの依頼テンプレート</h4>
+                    <p><strong>目的:</strong> [何を達成したいか]<br>
+                    <strong>対象:</strong> [変更するファイル/コンポーネント]<br>
+                    <strong>制約:</strong> [守るべきルール]<br>
+                    <strong>受け入れ条件:</strong> [完了の定義]</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>タダカヨ QRチャリティ・コネクト</p>
+            <p style="margin-top: 8px; opacity: 0.8;">
+                <a href="https://github.com/yasushi-honda-prog/tadakayo-qr-charity-connect">GitHub Repository</a>
+            </p>
+            <p style="margin-top: 16px; font-size: 0.85rem; opacity: 0.6;">
+                Built with AI-Driven Development
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true },
+            sequence: { useMaxWidth: true },
+            gantt: { useMaxWidth: true }
+        });
+    </script>
+</body>
+</html>
