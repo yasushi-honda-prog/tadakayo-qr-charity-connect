@@ -217,7 +217,7 @@
     <header>
         <div class="container">
             <h1>タダカヨ QRチャリティ・コネクト</h1>
-            <p>QRコードを起点としたスマートフォン寄付システム</p>
+            <p>QRコードを起点としたスマートフォン支援決済システム</p>
             <span class="badge">GCP Serverless Architecture</span>
         </div>
     </header>
@@ -227,7 +227,7 @@
             <ul>
                 <li><a href="#overview">概要</a></li>
                 <li><a href="#architecture">アーキテクチャ</a></li>
-                <li><a href="#donation-flow">寄付フロー</a></li>
+                <li><a href="#donation-flow">支援フロー</a></li>
                 <li><a href="#webhook">Webhook処理</a></li>
                 <li><a href="#data-model">データモデル</a></li>
                 <li><a href="#infrastructure">インフラ構成</a></li>
@@ -243,12 +243,17 @@
         <section id="overview">
             <div class="container">
                 <h2>プロジェクト概要</h2>
-                <p>本システムは、NPO法人タダカヨの活動を支援するための寄付プラットフォームです。チラシ・名刺・イベント投影に印刷されたQRコードをスキャンするだけで、PayPayや楽天ペイを通じてスムーズに寄付を完了できます。</p>
+                <p>本システムは、NPO法人タダカヨの活動を支援するための決済プラットフォームです。チラシ・名刺・イベント投影に印刷されたQRコードをスキャンするだけで、PayPayや楽天ペイを通じてスムーズに支援決済を完了できます。</p>
+
+                <div class="note" style="background: #f0fdf4; border-left-color: #10b981;">
+                    <strong>重要：対価性のある取引（売上）</strong><br>
+                    タダカヨの「支援」は、研修の提供やグッズの提供など<strong>対価性のある取引</strong>であり、経理上は「売上」として計上します。この位置づけにより、PayPay for Developers / 楽天ペイは<strong>商取引用途</strong>として適合します。
+                </div>
 
                 <div class="grid">
                     <div class="feature-card">
-                        <h4>簡単な寄付体験</h4>
-                        <p>QRコードをスキャンするだけで寄付画面へ。アプリのインストール不要。</p>
+                        <h4>簡単な支援体験</h4>
+                        <p>QRコードをスキャンするだけで支援画面へ。アプリのインストール不要。</p>
                     </div>
                     <div class="feature-card">
                         <h4>複数の決済手段</h4>
@@ -302,7 +307,7 @@ graph TB
         end
 
         subgraph "Data"
-            FS[(Firestore<br/>寄付記録)]
+            FS[(Firestore<br/>支援記録)]
             SM[Secret Manager<br/>APIキー/署名鍵]
         end
 
@@ -333,11 +338,11 @@ graph TB
             </div>
         </section>
 
-        <!-- 寄付フローセクション -->
+        <!-- 支援フローセクション -->
         <section id="donation-flow">
             <div class="container">
-                <h2>寄付フロー（シーケンス図）</h2>
-                <p>ユーザーがQRコードをスキャンしてから寄付が完了するまでの流れです。</p>
+                <h2>支援フロー（シーケンス図）</h2>
+                <p>ユーザーがQRコードをスキャンしてから支援決済が完了するまでの流れです。</p>
 
                 <div class="mermaid">
 sequenceDiagram
@@ -450,7 +455,7 @@ erDiagram
     donations {
         string id PK "自動生成ID"
         string source "流入元(flyer_001等)"
-        int amount "寄付金額"
+        int amount "支援金額"
         string currency "通貨(JPY)"
         string payment_provider "決済プロバイダ"
         string payment_id "決済プロバイダのID"
@@ -491,7 +496,7 @@ erDiagram
                     </tr>
                     <tr>
                         <td><code>donations</code></td>
-                        <td>寄付記録の保存</td>
+                        <td>支援記録の保存</td>
                         <td>source, status, created_at</td>
                     </tr>
                     <tr>
@@ -650,7 +655,7 @@ gantt
     section 第3段階: 本格運用
     管理画面                    :c1, after b3, 5d
     楽天ペイ統合                :c2, after c1, 5d
-    継続寄付検討                :c3, after c2, 3d
+    継続支援検討                :c3, after c2, 3d
                 </div>
 
                 <h3>マイルストーン詳細</h3>
@@ -662,7 +667,7 @@ gantt
                     </tr>
                     <tr>
                         <td>第1段階: MVP</td>
-                        <td>特定金額でPayPay決済が完了し、記録される</td>
+                        <td>特定金額でPayPay決済が完了し、支援記録が保存される</td>
                         <td><span class="status status-progress">進行中</span></td>
                     </tr>
                     <tr>
@@ -672,7 +677,7 @@ gantt
                     </tr>
                     <tr>
                         <td>第3段階: 本格運用</td>
-                        <td>管理画面、複数決済、継続寄付</td>
+                        <td>管理画面、複数決済、継続支援</td>
                         <td><span class="status status-pending">未着手</span></td>
                     </tr>
                 </table>
@@ -739,7 +744,7 @@ mindmap
                         </tr>
                         <tr>
                             <td>規約適合性</td>
-                            <td>寄付用途の利用可否を事前確認</td>
+                            <td>商取引として申請（対価性のある取引）</td>
                         </tr>
                     </table>
                 </div>
