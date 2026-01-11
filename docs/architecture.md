@@ -1,6 +1,10 @@
 # アーキテクチャ概要
 
-本システムは、チラシ・名刺・イベント投影のQRコードを起点に、スマホでのスムーズな寄付体験を提供します。PayPay for Developers / 楽天ペイのAPI連携により、寄付フローを自前で制御します。
+本システムは、チラシ・名刺・イベント投影のQRコードを起点に、スマホでのスムーズな支援決済体験を提供します。PayPay for Developers / 楽天ペイのAPI連携により、決済フローを自前で制御します。
+
+## 重要：対価性のある取引（売上）
+
+タダカヨの「支援」は、研修の提供やグッズの提供など**対価性のある取引**であり、経理上は「売上」として計上します。この位置づけにより、PayPay for Developers / 楽天ペイは**商取引用途**として適合します。
 
 ## システム構成図（Mermaid）
 ```mermaid
@@ -11,7 +15,7 @@ graph LR
 
     subgraph "Web"
         B -- HTTPS --> C[既存HP / ランディングページ]
-        C -- Donate --> D[Cloud Run API]
+        C -- 支援 --> D[Cloud Run API]
     end
 
     subgraph "GCP"
@@ -36,10 +40,10 @@ graph LR
 
 | コンポーネント | 役割 | 備考 |
 |--------------|------|------|
-| QRコード | 寄付導線の起点 | チラシ・名刺・イベント投影 |
-| 既存HP | 寄付案内ページ | 団体紹介、寄付の使い道 |
+| QRコード | 支援導線の起点 | チラシ・名刺・イベント投影 |
+| 既存HP | 支援案内ページ | 団体紹介、支援の使い道 |
 | Cloud Run | 決済セッション作成・Webhook受信 | API連携の中心 |
-| Firestore | 寄付履歴・決済状態の保存 | 監査/集計用 |
+| Firestore | 支援履歴・決済状態の保存 | 監査/集計用 |
 | Secret Manager | APIキー・署名鍵の保管 | ローテーション対応 |
 | Cloud NAT | 固定IPからのAPI通信 | 決済側のIP制限に対応 |
 | PayPay / 楽天ペイ | 決済API | 署名検証が必須 |
@@ -48,7 +52,7 @@ graph LR
 ## 想定フロー
 
 1. ユーザーがQRコードを読み取り、既存HP（または中継ページ）へアクセス
-2. 寄付金額を選択し、Cloud Runへ送信
+2. 支援金額を選択し、Cloud Runへ送信
 3. Cloud RunがPayPay/楽天ペイの決済セッションを作成
 4. ユーザーが決済画面へ遷移し、支払いを完了
 5. 決済プロバイダのWebhookで決済結果を受信
@@ -59,9 +63,9 @@ graph LR
 QRコードにパラメータを付与し、GA4で計測：
 
 ```
-チラシA用: https://example.org/donate?source=flyer_a
-名刺用:    https://example.org/donate?source=namecard
-イベント用: https://example.org/donate?source=event_2025
+チラシA用: https://example.org/support?source=flyer_a
+名刺用:    https://example.org/support?source=namecard
+イベント用: https://example.org/support?source=event_2025
 ```
 
 ## 採用しなかった構成

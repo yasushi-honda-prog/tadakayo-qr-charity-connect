@@ -4,10 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-タダカヨ QRチャリティ・コネクト - QRコードを起点としたスマホ寄付システム。チラシ・名刺・イベント投影のQRコードから寄付ページへ遷移し、PayPay/楽天ペイで寄付を完了する。
+タダカヨ QRチャリティ・コネクト - QRコードを起点としたスマホ支援決済システム。チラシ・名刺・イベント投影のQRコードから支援ページへ遷移し、PayPay/楽天ペイで決済を完了する。
 
 - GitHub: `tadakayo-qr-charity-connect`
-- 寄付プラットフォーム: PayPay for Developers / 楽天ペイ（API連携）
+- 決済プラットフォーム: PayPay for Developers / 楽天ペイ（API連携）
+
+### 重要：対価性のある取引（売上）
+
+タダカヨの「支援」は、研修の提供やグッズの提供など**対価性のある取引**であり、経理上は「売上」として計上する。これは現在の出張タダスク後の支援金も同様の扱いである。
+
+この位置づけにより、PayPay for Developers / 楽天ペイは**商取引用途**として適合する。
 
 ## アーキテクチャ
 
@@ -18,9 +24,9 @@ QRコード → 既存HP / ランディングページ → Cloud Run → PayPay/
 ```
 
 ### 主要コンポーネント
-- **既存HP**: 寄付導線ページ、寄付金額選択の入口
+- **既存HP**: 支援導線ページ、金額選択の入口
 - **Cloud Run**: 決済セッション作成、Webhook受信、リダイレクト
-- **Firestore**: 寄付履歴、決済ステータス保存
+- **Firestore**: 支援履歴、決済ステータス保存
 - **PayPay/楽天ペイ**: 決済API
 - **Google Analytics 4**: 流入元（QR種類）のトラッキング
 
@@ -28,16 +34,10 @@ QRコード → 既存HP / ランディングページ → Cloud Run → PayPay/
 - インフラ: **GCPサーバーレス**（Cloud Run / Firestore / Secret Manager / Cloud NAT）
 - 決済: PayPay for Developers / 楽天ペイ API連携
 
-## 重要な制約事項
+## 決済導入の流れ
 
-### PayPay/楽天ペイについて
-- 2026-01-11時点の公開情報では、寄付用途の適合性がグレー/不明瞭な点があるため、**事前に規約確認と窓口確認が必須**
-- **PayPay for Developers**: 商取引向けの記載が中心。寄付/募金用途の適用可否を確認する
-- **楽天ペイ**: NPO向け寄付の明確な導入記載が乏しいため、利用可否を確認する
-
-### 寄付決済の導入方法
-1. PayPay for Developers / 楽天ペイの事前審査・契約
-2. 既存HPに寄付導線を追加（寄付金額選択ページ）
+1. PayPay for Developers / 楽天ペイに商取引として申請・契約
+2. 既存HPに支援導線を追加（金額選択ページ）
 3. 決済API連携（セッション作成、Webhook受信、署名検証）
 4. QRコード作成と流入元パラメータの付与
 
@@ -50,7 +50,6 @@ QRコード → 既存HP / ランディングページ → Cloud Run → PayPay/
 ## 参考リンク
 - [PayPay for Developers](https://paypay.ne.jp/store-online/)
 - [楽天ペイ（オンライン決済）](https://checkout.rakuten.co.jp/biz/)
-- [PayPay 寄付・お賽銭](https://paypay.ne.jp/guide/donation/)
 
 ## 過去の検討事項
 以下は調査の結果、採用しないことになった選択肢：
