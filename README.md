@@ -4,34 +4,32 @@ QRコードを起点としたスマートフォン寄付システム。チラシ
 
 ## 概要
 
-本システムは、NPO法人タダカヨの活動を支援するための寄付プラットフォームです。紙媒体やイベント投影に印刷されたQRコードから、PayPayや楽天ペイなどの決済サービスを通じてスムーズに寄付を完了できます。
+本システムは、NPO法人タダカヨの活動を支援するための寄付プラットフォームです。ソフトバンク「つながる募金」を活用し、PayPayやクレジットカードでスムーズに寄付を完了できます。
 
 ## 特徴
 
 - **簡単な寄付体験**: QRコードをスキャンするだけで寄付画面へ
-- **複数の決済手段**: PayPay、楽天ペイに対応（順次拡大予定）
-- **流入元トラッキング**: チラシ・名刺・イベントごとの効果測定が可能
-- **低コスト運用**: GCPサーバーレス構成による従量課金
+- **複数の決済手段**: PayPay、クレジットカード、携帯料金合算に対応
+- **流入元トラッキング**: チラシ・名刺・イベントごとの効果測定が可能（GA4）
+- **低コスト運用**: 月額無料、手数料2.4%のみ
 
 ## アーキテクチャ
 
 ```
 QRコード (チラシ/名刺/スライド)
     ↓ スキャン
-Cloud Run (Backend API)
-    ↓ 決済リクエスト
-PayPay / 楽天ペイ API
-    ↓ Webhook通知
-Cloud Firestore (寄付記録)
+既存HP / ランディングページ
+    ↓ リンク
+つながる募金（寄付ページ）
+    ↓ 決済
+PayPay / クレカ / 携帯料金合算
 ```
 
-### 使用技術
+### 使用サービス
 
-- **Cloud Run**: APIエンドポイント、決済遷移、Webhook受信
-- **Cloud Firestore**: 寄付履歴・決済ステータス・流入元の保存
-- **Secret Manager**: APIキー・署名鍵の安全な管理
-- **Cloud NAT**: 決済プロバイダ向け固定IP
-- **Terraform**: インフラのコード管理
+- **つながる募金**: 寄付決済処理（ソフトバンク運営）
+- **既存HP**: 寄付案内ページ
+- **Google Analytics 4**: 流入元トラッキング
 
 ## ドキュメント
 
@@ -41,10 +39,19 @@ Cloud Firestore (寄付記録)
 - [運用ガイド](docs/operations.md)
 - [AI駆動開発ガイド](docs/ai-development.md)
 - [ADR一覧](docs/adr/)
+- [調査レポート](docs/research/)
 
 ## 開発状況
 
-現在、第1段階（MVP）の構築中です。詳細は[ロードマップ](docs/roadmap.md)を参照してください。
+つながる募金への申し込み準備中です。詳細は[ロードマップ](docs/roadmap.md)を参照してください。
+
+## 重要な制約事項
+
+調査の結果、以下が判明しました（詳細は[ADR-004](docs/adr/ADR-004-payment-provider-selection.md)参照）：
+
+- **PayPay for Developers**: 寄付目的での利用は規約違反
+- **楽天ペイ**: NPO向け寄付決済に非対応
+- **つながる募金**: PayPay寄付に対応（2025年3月〜）
 
 ## ライセンス
 
@@ -53,5 +60,5 @@ MIT License
 ## 関連リンク
 
 - [タダカヨ公式サイト](https://tadakayo.org/)
-- [PayPay for Developers](https://paypay.ne.jp/store-online/)
-- [楽天ペイ](https://checkout.rakuten.co.jp/biz/)
+- [つながる募金（NPO向け）](https://www.softbank.jp/corp/sustainability/esg/social/local-communities/tunagaru-bokin/npo/)
+- [PayPay 寄付・お賽銭](https://paypay.ne.jp/guide/donation/)
