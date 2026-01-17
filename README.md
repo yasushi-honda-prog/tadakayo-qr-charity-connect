@@ -63,6 +63,6 @@ MIT License
 
 ## 関連リンク
 
-- [タダカヨ公式サイト](https://tadakayo.org/)
+- [タダカヨ公式サイト](https://mmky310.info/)
 - [PayPay for Developers](https://paypay.ne.jp/store-online/)
 - [楽天ペイ（オンライン決済）](https://checkout.rakuten.co.jp/biz/)
