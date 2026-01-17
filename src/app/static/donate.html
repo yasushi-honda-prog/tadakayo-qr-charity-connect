@@ -56,6 +56,39 @@
             font-size: 0.85rem;
             opacity: 0.9;
         }
+        .demo-badge {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 8px;
+            border: 1px solid #ffc107;
+        }
+        .demo-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .demo-notice-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .demo-notice-text {
+            font-size: 0.85rem;
+            color: #856404;
+            line-height: 1.6;
+        }
         main {
             max-width: 480px;
             margin: 0 auto;
@@ -259,6 +292,7 @@
             <div class="header-text">
                 <h1>タダカヨ</h1>
                 <p>タダでカイゴをヨくしよう！</p>
+                <span class="demo-badge">デモ版</span>
             </div>
         </div>
     </header>
@@ -269,6 +303,16 @@
             <p class="hero-text">
                 福祉現場のICT活用を<br>「タダ」で支援するNPO法人です
             </p>
+        </div>
+
+        <div class="demo-notice">
+            <div class="demo-notice-title">
+                📌 ただいまデモ版で動作確認中です
+            </div>
+            <div class="demo-notice-text">
+                このページはシステム開発中のデモ版です。<br>
+                決済プロバイダ（PayPay・楽天ペイ）の審査通過後、正式版を公開し、QRコードを発行・掲載予定です。
+            </div>
         </div>
 
         <div id="errorMessage" class="error-message"></div>
