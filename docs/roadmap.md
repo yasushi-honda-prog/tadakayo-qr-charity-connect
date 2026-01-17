@@ -2,6 +2,7 @@
 
 ## 第1段階: 契約・準備
 
+- [x] 申請要件の整理（[docs/payment-provider-application.md](payment-provider-application.md)）
 - [ ] PayPay for Developers に商取引として申請
   - 研修・グッズ等のサービス/商品提供として申請
   - 必要書類の準備（法人情報、銀行口座等）
@@ -11,7 +12,8 @@
 
 ## 第2段階: インフラ整備
 
-- [ ] GCPプロジェクトとGitHub連携の設定
+- [x] GCPプロジェクト作成（tadakayo-qr-connect）
+- [ ] GitHub連携の設定（Workload Identity等）
 - [ ] Cloud Run / Firestore / Secret Manager 構築
 - [ ] Cloud NAT構築（固定IPの確保）
 - [ ] 監視・ログ基盤の最低限セットアップ
