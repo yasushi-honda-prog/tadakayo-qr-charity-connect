@@ -27,16 +27,22 @@
 ## 第3段階: MVP実装
 
 - [ ] 支援金額選択ページの作成
-- [ ] PayPay決済セッション作成API
-- [ ] PayPay Webhook受信 + 署名検証
-- [ ] Firestoreへの支援記録保存
+- [x] PayPay決済セッション作成API（モック版完了、本番接続は審査後）
+- [x] PayPay Webhook受信 + 署名検証（モック版完了）
+- [x] Firestoreへの支援記録保存（InMemory + Firestore両対応）
 - [ ] サンクスページ表示
+
+**実装済みコンポーネント:**
+- `src/app/adapters/` - 決済プロバイダアダプタ（PayPay/楽天ペイ）
+- `src/app/services/payment.py` - 決済サービス
+- `src/app/api/donations.py` - APIエンドポイント
+- `src/tests/unit/` - ユニットテスト30件
 
 ## 第4段階: 複数決済対応
 
-- [ ] 楽天ペイ決済セッション作成API
-- [ ] 楽天ペイ Webhook受信 + 署名検証
-- [ ] 決済プロバイダ差分の抽象化
+- [x] 楽天ペイ決済セッション作成API（モック版完了）
+- [x] 楽天ペイ Webhook受信 + 署名検証（モック版完了）
+- [x] 決済プロバイダ差分の抽象化（PaymentProviderAdapter ABC）
 
 ## 第5段階: 運用・分析強化
 
