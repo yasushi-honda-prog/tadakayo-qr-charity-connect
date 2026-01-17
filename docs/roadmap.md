@@ -13,10 +13,16 @@
 ## 第2段階: インフラ整備
 
 - [x] GCPプロジェクト作成（tadakayo-qr-connect）
-- [ ] GitHub連携の設定（Workload Identity等）
-- [ ] Cloud Run / Firestore / Secret Manager 構築
-- [ ] Cloud NAT構築（固定IPの確保）
+- [x] GitHub連携の設定（Workload Identity Federation）
+- [x] Cloud Run / Firestore / Secret Manager 構築
+- [x] Cloud NAT構築（固定IP: 34.84.72.66）
+- [x] Artifact Registry（最新2バージョン保持ポリシー）
 - [ ] 監視・ログ基盤の最低限セットアップ
+
+**構築済みリソース:**
+- Cloud Run: https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app
+- Terraform: `infrastructure/environments/sandbox/`
+- CI/CD: `.github/workflows/ci.yml`, `deploy-sandbox.yml`
 
 ## 第3段階: MVP実装
 
