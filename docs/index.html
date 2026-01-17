@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タダカヨ QRチャリティ・コネクト</title>
+    <style>
+        :root {
+            --primary: #E52D27;
+            --primary-dark: #c41e1a;
+            --bg: #fff5f5;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e8e8e8;
+            --success: #2e7d32;
+            --info: #1976d2;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+        }
+
+        /* ヘッダー */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background: white;
+            object-fit: contain;
+        }
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        .status-badge {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-top: 16px;
+        }
+
+        /* メインコンテンツ */
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* セクション */
+        section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        section h2 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg);
+        }
+
+        /* キャラクター紹介 */
+        .intro {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .character-img {
+            width: 200px;
+            border-radius: 16px;
+        }
+        .intro-text {
+            flex: 1;
+            min-width: 280px;
+        }
+        .intro-text p {
+            margin-bottom: 16px;
+            color: var(--text-light);
+        }
+
+        /* デモボタン */
+        .demo-area {
+            text-align: center;
+            padding: 32px;
+            background: linear-gradient(135deg, #fff0f0 0%, #ffe8e8 100%);
+            border-radius: 16px;
+            margin: 32px 0;
+        }
+        .demo-area h3 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .demo-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(229, 45, 39, 0.3);
+        }
+        .demo-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(229, 45, 39, 0.4);
+        }
+        .demo-note {
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* フロー図 */
+        .flow-diagram {
+            padding: 24px 0;
+        }
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+            padding-bottom: 32px;
+            border-left: 3px solid var(--border);
+            margin-left: -26px;
+            padding-left: 46px;
+        }
+        .flow-step:last-child .step-content {
+            border-left: none;
+        }
+        .step-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .step-content p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        .step-icon {
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+
+        /* 進捗状況 */
+        .progress-list {
+            list-style: none;
+        }
+        .progress-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .progress-list li:last-child {
+            border-bottom: none;
+        }
+        .status-done {
+            color: var(--success);
+            font-weight: 600;
+        }
+        .status-pending {
+            color: var(--info);
+            font-weight: 600;
+        }
+        .status-icon {
+            font-size: 1.2rem;
+        }
+
+        /* 技術情報（折りたたみ） */
+        details {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        details summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+        }
+        details[open] summary {
+            margin-bottom: 16px;
+        }
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .tech-tag {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* 説明エリア */
+        .explanation-area {
+            background: #f0f7ff;
+            border-left: 4px solid var(--info);
+            padding: 20px 24px;
+            border-radius: 0 12px 12px 0;
+            margin: 24px 0;
+        }
+        .explanation-area h4 {
+            color: var(--info);
+            margin-bottom: 12px;
+        }
+        .explanation-area p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* フッター */
+        footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 600px) {
+            .logo-area {
+                flex-direction: column;
+            }
+            .intro {
+                flex-direction: column;
+                text-align: center;
+            }
+            .character-img {
+                width: 160px;
+            }
+            section {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-area">
+                <img src="assets/tadakayo-logo.jpg" alt="タダカヨ" class="logo">
+                <div>
+                    <h1>QRチャリティ・コネクト</h1>
+                    <p>QRコードで、かんたん支援</p>
+                </div>
+            </div>
+            <span class="status-badge">現在開発中（デモ版公開中）</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- プロジェクト紹介 -->
+        <section>
+            <h2>このプロジェクトについて</h2>
+            <div class="intro">
+                <img src="assets/tadakayo-character.png" alt="タダカヨキャラクター" class="character-img">
+                <div class="intro-text">
+                    <p>
+                        <strong>「QRチャリティ・コネクト」</strong>は、チラシや名刺、イベントスライドに印刷されたQRコードをスマホで読み取るだけで、かんたんにタダカヨを支援できるシステムです。
+                    </p>
+                    <p>
+                        PayPayや楽天ペイなど、普段使い慣れた決済アプリで、その場ですぐに支援が完了します。
+                    </p>
+                    <p>
+                        タダカヨの研修やグッズ提供への支援（対価性のある取引）として、皆さまのお気持ちを届ける仕組みです。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- デモエリア -->
+        <div class="demo-area">
+            <h3>デモ版を体験してみる</h3>
+            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" class="demo-btn" target="_blank">
+                デモ版を開く
+            </a>
+            <p class="demo-note">
+                ※ 現在はデモ版です。実際の決済は行われません。<br>
+                決済プロバイダの審査通過後、正式版を公開予定です。
+            </p>
+        </div>
+
+        <!-- 使い方フロー -->
+        <section>
+            <h2>支援の流れ</h2>
+            <div class="flow-diagram">
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4><span class="step-icon">📱</span>QRコードを読み取る</h4>
+                            <p>チラシ・名刺・イベントスライドなどに印刷されたQRコードを、スマートフォンのカメラで読み取ります。</p>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4><span class="step-icon">💰</span>支援金額を選ぶ</h4>
+                            <p>500円、1,000円、3,000円、5,000円から選ぶか、自由な金額を入力します。</p>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4><span class="step-icon">💳</span>決済方法を選ぶ</h4>
+                            <p>PayPayまたは楽天ペイを選んで、普段通りに決済します。</p>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4><span class="step-icon">🎉</span>支援完了！</h4>
+                            <p>ありがとうございます！いただいた支援は、福祉現場のICT活用支援に役立てられます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explanation-area">
+                <h4>💡 QRコードの設置場所</h4>
+                <p>
+                    正式版公開後、以下のような場所にQRコードを設置予定です：<br>
+                    ・タダカヨのチラシ、パンフレット<br>
+                    ・スタッフの名刺<br>
+                    ・研修・イベントのスライド<br>
+                    ・ウェブサイト
+                </p>
+            </div>
+        </section>
+
+        <!-- 開発進捗 -->
+        <section>
+            <h2>開発の進捗状況</h2>
+            <ul class="progress-list">
+                <li>
+                    <span class="status-icon">✅</span>
+                    <span class="status-done">完了</span>
+                    <span>システム基盤の構築（サーバー、データベース）</span>
+                </li>
+                <li>
+                    <span class="status-icon">✅</span>
+                    <span class="status-done">完了</span>
+                    <span>支援ページのデザイン・実装（デモ版）</span>
+                </li>
+                <li>
+                    <span class="status-icon">✅</span>
+                    <span class="status-done">完了</span>
+                    <span>PayPay・楽天ペイ連携の仕組み（デモ版）</span>
+                </li>
+                <li>
+                    <span class="status-icon">🔄</span>
+                    <span class="status-pending">進行中</span>
+                    <span>決済プロバイダ（PayPay・楽天ペイ）への申請・契約</span>
+                </li>
+                <li>
+                    <span class="status-icon">⏳</span>
+                    <span>予定</span>
+                    <span>正式版の公開、QRコードの発行</span>
+                </li>
+                <li>
+                    <span class="status-icon">⏳</span>
+                    <span>予定</span>
+                    <span>効果測定・分析機能の追加</span>
+                </li>
+            </ul>
+
+            <details>
+                <summary>技術的な詳細を見る</summary>
+                <p style="margin-bottom: 12px; color: #666;">このシステムで使用している技術：</p>
+                <div class="tech-list">
+                    <span class="tech-tag">Google Cloud Run</span>
+                    <span class="tech-tag">Cloud Firestore</span>
+                    <span class="tech-tag">PayPay API</span>
+                    <span class="tech-tag">楽天ペイ API</span>
+                    <span class="tech-tag">Python / FastAPI</span>
+                    <span class="tech-tag">Terraform</span>
+                </div>
+                <p style="margin-top: 16px;">
+                    <a href="https://github.com/yasushi-honda-prog/tadakayo-qr-charity-connect" target="_blank">
+                        GitHub でソースコードを見る →
+                    </a>
+                </p>
+            </details>
+        </section>
+
+        <!-- タダカヨについて -->
+        <section>
+            <h2>タダカヨとは</h2>
+            <p style="margin-bottom: 16px;">
+                <strong>NPO法人タダカヨ</strong>は、「タダでカイゴをヨくしよう！」をモットーに、福祉現場のICT活用を無料で支援するNPO法人です。
+            </p>
+            <p style="margin-bottom: 24px; color: var(--text-light);">
+                研修やツール導入支援を通じて、福祉の現場をより良くする活動を行っています。皆さまからの支援は、これらの活動に活用させていただきます。
+            </p>
+            <a href="https://mmky310.info/" target="_blank" style="color: var(--primary); font-weight: 600;">
+                タダカヨ公式サイトを見る →
+            </a>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            <a href="https://mmky310.info/" target="_blank">NPO法人タダカヨ</a> |
+            <a href="https://github.com/yasushi-honda-prog/tadakayo-qr-charity-connect" target="_blank">GitHub</a>
+        </p>
+        <p style="margin-top: 8px; font-size: 0.85rem;">
+            &copy; 2026 NPO法人タダカヨ
+        </p>
+    </footer>
+</body>
+</html>
