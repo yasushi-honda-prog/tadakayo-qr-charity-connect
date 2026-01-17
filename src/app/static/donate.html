@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支援金額の選択 | タダカヨ</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --error: #ef4444;
+            --success: #22c55e;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 24px 16px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+        main {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .amount-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 16px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .amount-btn:hover {
+            border-color: var(--primary);
+            background: #f0f7ff;
+        }
+        .amount-btn.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+        .custom-amount {
+            margin-bottom: 32px;
+        }
+        .custom-amount label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        .custom-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 4px;
+            transition: border-color 0.2s;
+        }
+        .custom-input-wrapper:focus-within {
+            border-color: var(--primary);
+        }
+        .custom-input-wrapper.selected {
+            border-color: var(--primary);
+            background: #f0f7ff;
+        }
+        .custom-amount input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            outline: none;
+            width: 100%;
+        }
+        .custom-amount input::placeholder {
+            color: var(--text-light);
+            font-weight: 400;
+        }
+        .currency-label {
+            padding: 0 16px;
+            font-size: 1rem;
+            color: var(--text-light);
+        }
+        .provider-section {
+            margin-top: 32px;
+        }
+        .provider-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 18px 24px;
+            margin-bottom: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .provider-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .provider-btn.paypay {
+            background: #ff0033;
+            color: white;
+        }
+        .provider-btn.paypay:hover:not(:disabled) {
+            background: #cc0029;
+        }
+        .provider-btn.rakuten {
+            background: #bf0000;
+            color: white;
+        }
+        .provider-btn.rakuten:hover:not(:disabled) {
+            background: #990000;
+        }
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .error-message.show {
+            display: block;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        .loading-overlay.show {
+            display: flex;
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 16px;
+            font-size: 1rem;
+            color: var(--text);
+        }
+        footer {
+            text-align: center;
+            padding: 24px 16px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        @media (max-width: 360px) {
+            .amount-btn {
+                padding: 16px 12px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>タダカヨ QRチャリティ・コネクト</h1>
+        <p>タダカヨの活動を支援する</p>
+    </header>
+
+    <main>
+        <div id="errorMessage" class="error-message"></div>
+
+        <section>
+            <h2 class="section-title">支援金額を選択</h2>
+            <div class="amount-grid">
+                <button class="amount-btn" data-amount="500">500円</button>
+                <button class="amount-btn" data-amount="1000">1,000円</button>
+                <button class="amount-btn" data-amount="3000">3,000円</button>
+                <button class="amount-btn" data-amount="5000">5,000円</button>
+            </div>
+            <div class="custom-amount">
+                <label for="customAmount">その他の金額（100円〜1,000,000円）</label>
+                <div class="custom-input-wrapper" id="customWrapper">
+                    <input type="number" id="customAmount" min="100" max="1000000" step="100" placeholder="金額を入力">
+                    <span class="currency-label">円</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="provider-section">
+            <h2 class="section-title">決済方法を選択して支援</h2>
+            <button class="provider-btn paypay" data-provider="paypay">
+                PayPayで支援する
+            </button>
+            <button class="provider-btn rakuten" data-provider="rakuten">
+                楽天ペイで支援する
+            </button>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="https://tadakayo.or.jp" target="_blank">NPO法人タダカヨ</a></p>
+    </footer>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p class="loading-text">決済画面へ移動中...</p>
+    </div>
+
+    <script>
+        // 状態管理
+        let selectedAmount = null;
+
+        // DOM要素
+        const amountBtns = document.querySelectorAll('.amount-btn');
+        const customInput = document.getElementById('customAmount');
+        const customWrapper = document.getElementById('customWrapper');
+        const providerBtns = document.querySelectorAll('.provider-btn');
+        const errorMessage = document.getElementById('errorMessage');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // URLパラメータからsourceを取得（未指定時はdirect）
+        const params = new URLSearchParams(window.location.search);
+        const source = params.get('source') || 'direct';
+
+        // プリセット金額ボタンのクリックハンドラ
+        amountBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 他のボタンの選択解除
+                amountBtns.forEach(b => b.classList.remove('selected'));
+                customWrapper.classList.remove('selected');
+                customInput.value = '';
+
+                // このボタンを選択
+                btn.classList.add('selected');
+                selectedAmount = parseInt(btn.dataset.amount);
+                hideError();
+            });
+        });
+
+        // カスタム金額入力のハンドラ
+        customInput.addEventListener('input', () => {
+            const value = parseInt(customInput.value);
+
+            // プリセットボタンの選択解除
+            amountBtns.forEach(b => b.classList.remove('selected'));
+
+            if (value && value >= 100 && value <= 1000000) {
+                customWrapper.classList.add('selected');
+                selectedAmount = value;
+                hideError();
+            } else {
+                customWrapper.classList.remove('selected');
+                selectedAmount = null;
+            }
+        });
+
+        customInput.addEventListener('focus', () => {
+            amountBtns.forEach(b => b.classList.remove('selected'));
+        });
+
+        // 決済プロバイダボタンのクリックハンドラ
+        providerBtns.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const provider = btn.dataset.provider;
+                await createCheckout(provider);
+            });
+        });
+
+        // 決済セッション作成
+        async function createCheckout(provider) {
+            // バリデーション
+            if (!selectedAmount) {
+                showError('金額を選択してください');
+                return;
+            }
+
+            if (selectedAmount < 100 || selectedAmount > 1000000) {
+                showError('金額は100円から1,000,000円の範囲で入力してください');
+                return;
+            }
+
+            // ローディング表示
+            showLoading();
+            hideError();
+
+            try {
+                const baseUrl = window.location.origin;
+                const response = await fetch('/api/donations/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: selectedAmount,
+                        currency: 'JPY',
+                        source: source,
+                        provider: provider,
+                        return_url: `${baseUrl}/thanks`,
+                        cancel_url: `${baseUrl}/cancel`,
+                        idempotency_key: crypto.randomUUID()
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || 'エラーが発生しました');
+                }
+
+                const data = await response.json();
+
+                // 決済画面へリダイレクト
+                window.location.href = data.redirect_url;
+            } catch (error) {
+                hideLoading();
+                showError(error.message || '通信エラーが発生しました。再度お試しください。');
+            }
+        }
+
+        // エラー表示
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        function hideError() {
+            errorMessage.classList.remove('show');
+        }
+
+        // ローディング表示
+        function showLoading() {
+            loadingOverlay.classList.add('show');
+            providerBtns.forEach(btn => btn.disabled = true);
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.remove('show');
+            providerBtns.forEach(btn => btn.disabled = false);
+        }
+    </script>
+</body>
+</html>

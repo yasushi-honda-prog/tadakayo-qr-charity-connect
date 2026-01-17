@@ -1,11 +1,14 @@
 """FastAPI application entry point."""
 
+import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import AsyncGenerator
 
 import structlog
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.adapters.paypay import PayPayAdapter
@@ -73,6 +76,31 @@ app = FastAPI(
 
 # Include routers
 app.include_router(donations_router)
+
+# Static files directory
+STATIC_DIR = Path(__file__).parent / "static"
+
+# Mount static files (for CSS, JS, images if needed)
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+@app.get("/donate")
+async def donate_page() -> FileResponse:
+    """Serve the donation amount selection page."""
+    return FileResponse(STATIC_DIR / "donate.html")
+
+
+@app.get("/thanks")
+async def thanks_page() -> FileResponse:
+    """Serve the thank you page."""
+    return FileResponse(STATIC_DIR / "thanks.html")
+
+
+@app.get("/cancel")
+async def cancel_page() -> FileResponse:
+    """Serve the cancellation page."""
+    return FileResponse(STATIC_DIR / "cancel.html")
 
 
 @app.get("/health")
