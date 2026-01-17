@@ -6,16 +6,16 @@
     <title>支援金額の選択 | タダカヨ</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #10b981;
-            --bg: #f8fafc;
+            --primary: #E52D27;
+            --primary-dark: #c41e1a;
+            --secondary: #1a1a1a;
+            --bg: #fff5f5;
             --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --error: #ef4444;
-            --success: #22c55e;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e8e8e8;
+            --error: #d32f2f;
+            --success: #2e7d32;
         }
         * {
             margin: 0;
@@ -32,22 +32,49 @@
         header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 24px 16px;
+            padding: 20px 16px;
             text-align: center;
         }
-        header h1 {
-            font-size: 1.3rem;
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .header-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: white;
+            object-fit: contain;
+        }
+        .header-text h1 {
+            font-size: 1.2rem;
             font-weight: 600;
         }
-        header p {
-            font-size: 0.9rem;
+        .header-text p {
+            font-size: 0.85rem;
             opacity: 0.9;
-            margin-top: 4px;
         }
         main {
             max-width: 480px;
             margin: 0 auto;
             padding: 24px 16px;
+        }
+        .hero-section {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .hero-image {
+            max-width: 280px;
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .hero-text {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            line-height: 1.6;
         }
         .section-title {
             font-size: 1.1rem;
@@ -74,7 +101,7 @@
         }
         .amount-btn:hover {
             border-color: var(--primary);
-            background: #f0f7ff;
+            background: #fff0f0;
         }
         .amount-btn.selected {
             border-color: var(--primary);
@@ -104,7 +131,7 @@
         }
         .custom-input-wrapper.selected {
             border-color: var(--primary);
-            background: #f0f7ff;
+            background: #fff0f0;
         }
         .custom-amount input {
             flex: 1;
@@ -162,7 +189,7 @@
             background: #990000;
         }
         .error-message {
-            background: #fef2f2;
+            background: #ffebee;
             border: 1px solid var(--error);
             color: var(--error);
             padding: 12px 16px;
@@ -227,11 +254,23 @@
 </head>
 <body>
     <header>
-        <h1>タダカヨ QRチャリティ・コネクト</h1>
-        <p>タダカヨの活動を支援する</p>
+        <div class="header-content">
+            <img src="/static/assets/tadakayo-logo.jpg" alt="タダカヨ" class="header-logo">
+            <div class="header-text">
+                <h1>タダカヨ</h1>
+                <p>タダでカイゴをヨくしよう！</p>
+            </div>
+        </div>
     </header>
 
     <main>
+        <div class="hero-section">
+            <img src="/static/assets/tadakayo-character.png" alt="NPO法人タダカヨ - 介護×IT" class="hero-image">
+            <p class="hero-text">
+                福祉現場のICT活用を<br>「タダ」で支援するNPO法人です
+            </p>
+        </div>
+
         <div id="errorMessage" class="error-message"></div>
 
         <section>
