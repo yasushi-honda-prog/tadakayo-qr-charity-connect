@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>支援金額の選択 | タダカヨ</title>
+    <title>QRコードで支援 | タダカヨ</title>
     <style>
         :root {
             --primary: #E52D27;
@@ -16,6 +16,7 @@
             --border: #e8e8e8;
             --error: #d32f2f;
             --success: #2e7d32;
+            --paypay: #ff0033;
         }
         * {
             margin: 0;
@@ -99,7 +100,7 @@
             margin-bottom: 24px;
         }
         .hero-image {
-            max-width: 280px;
+            max-width: 200px;
             width: 100%;
             border-radius: 12px;
             margin-bottom: 16px;
@@ -115,18 +116,130 @@
             margin-bottom: 16px;
             color: var(--text);
         }
+        .section-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+        /* QRコード金額選択（メインコンテンツ） */
+        .qr-main-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .qr-main-section .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .qr-icon {
+            font-size: 1.3rem;
+        }
+        .qr-amount-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .qr-amount-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid var(--paypay);
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .qr-amount-btn:hover {
+            background: var(--paypay);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 0, 51, 0.3);
+        }
+        .qr-amount-btn .amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .qr-amount-btn .label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+        .qr-amount-btn:hover .label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .qr-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        .qr-flow-step {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .qr-flow-arrow {
+            color: var(--paypay);
+        }
+        /* カスタム金額セクション（サブ） */
+        .custom-section {
+            border-top: 1px solid var(--border);
+            padding-top: 32px;
+            margin-top: 16px;
+        }
+        .custom-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+        .custom-section-header h2 {
+            font-size: 1rem;
+            color: var(--text-light);
+        }
+        .toggle-icon {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            transition: transform 0.3s;
+        }
+        .custom-section.open .toggle-icon {
+            transform: rotate(180deg);
+        }
+        .custom-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .custom-section.open .custom-content {
+            max-height: 600px;
+        }
         .amount-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-bottom: 16px;
+            margin-top: 16px;
         }
         .amount-btn {
             background: var(--card-bg);
             border: 2px solid var(--border);
             border-radius: 12px;
-            padding: 20px 16px;
-            font-size: 1.2rem;
+            padding: 16px 12px;
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--text);
             cursor: pointer;
@@ -142,7 +255,7 @@
             color: white;
         }
         .custom-amount {
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
         .custom-amount label {
             display: block;
@@ -171,7 +284,7 @@
             border: none;
             background: transparent;
             padding: 12px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--text);
             outline: none;
@@ -186,19 +299,20 @@
             font-size: 1rem;
             color: var(--text-light);
         }
-        .provider-section {
-            margin-top: 32px;
+        .provider-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
         .provider-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 18px 24px;
-            margin-bottom: 12px;
+            padding: 16px 24px;
             border: none;
             border-radius: 12px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -277,61 +391,12 @@
             color: var(--primary);
             text-decoration: none;
         }
-        .qr-section {
-            margin-top: 48px;
-            padding-top: 32px;
-            border-top: 1px solid var(--border);
-        }
-        .qr-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        #qrCode {
-            background: white;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-        #qrCode img {
-            display: block;
-        }
-        .qr-text {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            text-align: center;
-            line-height: 1.6;
-        }
-        .qr-links {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .qr-link-btn {
-            display: block;
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text);
-            text-decoration: none;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .qr-link-btn:hover {
-            border-color: #ff0033;
-            background: #fff0f0;
-            color: #ff0033;
-        }
         @media (max-width: 360px) {
+            .qr-amount-btn .amount {
+                font-size: 1.2rem;
+            }
             .amount-btn {
-                padding: 16px 12px;
+                padding: 14px 10px;
                 font-size: 1rem;
             }
         }
@@ -364,56 +429,83 @@
             </div>
             <div class="demo-notice-text">
                 PayPay決済のテスト環境に接続済みです。<br>
-                本番環境での決済は、PayPayの審査通過後に開始予定です。<br>
-                <span style="font-size: 0.8rem; opacity: 0.8;">※楽天ペイは現在モック動作です</span>
+                本番環境での決済は、PayPayの審査通過後に開始予定です。
             </div>
         </div>
 
-        <div id="errorMessage" class="error-message"></div>
-
-        <section>
-            <h2 class="section-title">支援金額を選択</h2>
-            <div class="amount-grid">
-                <button class="amount-btn" data-amount="500">500円</button>
-                <button class="amount-btn" data-amount="1000">1,000円</button>
-                <button class="amount-btn" data-amount="3000">3,000円</button>
-                <button class="amount-btn" data-amount="5000">5,000円</button>
+        <!-- メイン：QRコード金額選択 -->
+        <section class="qr-main-section">
+            <h2 class="section-title">
+                <span class="qr-icon">📱</span>
+                QRコードで支援
+            </h2>
+            <p class="section-subtitle">
+                金額を選んでQRコードを発行。<br>
+                PayPayアプリでスキャンするだけで支援完了！
+            </p>
+            <div class="qr-amount-grid">
+                <a href="/qr/500" class="qr-amount-btn">
+                    <span class="amount">500円</span>
+                    <span class="label">QRコードを発行</span>
+                </a>
+                <a href="/qr/1000" class="qr-amount-btn">
+                    <span class="amount">1,000円</span>
+                    <span class="label">QRコードを発行</span>
+                </a>
+                <a href="/qr/3000" class="qr-amount-btn">
+                    <span class="amount">3,000円</span>
+                    <span class="label">QRコードを発行</span>
+                </a>
+                <a href="/qr/5000" class="qr-amount-btn">
+                    <span class="amount">5,000円</span>
+                    <span class="label">QRコードを発行</span>
+                </a>
             </div>
-            <div class="custom-amount">
-                <label for="customAmount">その他の金額（100円〜1,000,000円）</label>
-                <div class="custom-input-wrapper" id="customWrapper">
-                    <input type="number" id="customAmount" min="100" max="1000000" step="100" placeholder="金額を入力">
-                    <span class="currency-label">円</span>
+            <div class="qr-flow">
+                <span class="qr-flow-step">金額選択</span>
+                <span class="qr-flow-arrow">→</span>
+                <span class="qr-flow-step">QR表示</span>
+                <span class="qr-flow-arrow">→</span>
+                <span class="qr-flow-step">PayPayスキャン</span>
+                <span class="qr-flow-arrow">→</span>
+                <span class="qr-flow-step">完了</span>
+            </div>
+        </section>
+
+        <!-- サブ：カスタム金額での支援 -->
+        <section class="custom-section" id="customSection">
+            <div class="custom-section-header" onclick="toggleCustomSection()">
+                <h2>その他の金額で支援する</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="custom-content">
+                <div id="errorMessage" class="error-message"></div>
+
+                <div class="amount-grid">
+                    <button class="amount-btn" data-amount="500">500円</button>
+                    <button class="amount-btn" data-amount="1000">1,000円</button>
+                    <button class="amount-btn" data-amount="3000">3,000円</button>
+                    <button class="amount-btn" data-amount="5000">5,000円</button>
+                </div>
+                <div class="custom-amount">
+                    <label for="customAmount">任意の金額（100円〜1,000,000円）</label>
+                    <div class="custom-input-wrapper" id="customWrapper">
+                        <input type="number" id="customAmount" min="100" max="1000000" step="100" placeholder="金額を入力">
+                        <span class="currency-label">円</span>
+                    </div>
+                </div>
+
+                <div class="provider-btns">
+                    <button class="provider-btn paypay" data-provider="paypay">
+                        PayPayで支援する
+                    </button>
+                    <button class="provider-btn rakuten" data-provider="rakuten">
+                        楽天ペイで支援する
+                    </button>
                 </div>
             </div>
         </section>
-
-        <section class="provider-section">
-            <h2 class="section-title">決済方法を選択して支援</h2>
-            <button class="provider-btn paypay" data-provider="paypay">
-                PayPayで支援する
-            </button>
-            <button class="provider-btn rakuten" data-provider="rakuten">
-                楽天ペイで支援する
-            </button>
-        </section>
     </main>
-
-    <section class="qr-section">
-        <main style="max-width: 480px; margin: 0 auto; padding: 0 16px 24px;">
-            <h2 class="section-title">固定金額QRコードを発行</h2>
-            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 16px; line-height: 1.6;">
-                チラシ・名刺用のPayPay決済QRコードを発行できます。<br>
-                QRスキャン→PayPay決済の流れでスムーズに支援できます。
-            </p>
-            <div class="qr-links">
-                <a href="/qr/500" class="qr-link-btn">500円のQRコード</a>
-                <a href="/qr/1000" class="qr-link-btn">1,000円のQRコード</a>
-                <a href="/qr/3000" class="qr-link-btn">3,000円のQRコード</a>
-                <a href="/qr/5000" class="qr-link-btn">5,000円のQRコード</a>
-            </div>
-        </main>
-    </section>
 
     <footer>
         <p><a href="https://mmky310.info/" target="_blank">NPO法人タダカヨ</a></p>
@@ -425,6 +517,12 @@
     </div>
 
     <script>
+        // カスタムセクションの開閉
+        function toggleCustomSection() {
+            const section = document.getElementById('customSection');
+            section.classList.toggle('open');
+        }
+
         // 状態管理
         let selectedAmount = null;
 
