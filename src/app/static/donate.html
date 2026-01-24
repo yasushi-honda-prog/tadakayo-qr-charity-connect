@@ -225,34 +225,7 @@
             transition: max-height 0.3s ease-out;
         }
         .custom-section.open .custom-content {
-            max-height: 600px;
-        }
-        .amount-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-            margin-top: 16px;
-        }
-        .amount-btn {
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 16px 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .amount-btn:hover {
-            border-color: var(--primary);
-            background: #fff0f0;
-        }
-        .amount-btn.selected {
-            border-color: var(--primary);
-            background: var(--primary);
-            color: white;
+            max-height: 400px;
         }
         .custom-amount {
             margin-bottom: 24px;
@@ -395,10 +368,6 @@
             .qr-amount-btn .amount {
                 font-size: 1.2rem;
             }
-            .amount-btn {
-                padding: 14px 10px;
-                font-size: 1rem;
-            }
         }
     </style>
 
@@ -472,25 +441,19 @@
             </div>
         </section>
 
-        <!-- サブ：カスタム金額での支援 -->
+        <!-- サブ：任意金額での支援 -->
         <section class="custom-section" id="customSection">
             <div class="custom-section-header" onclick="toggleCustomSection()">
-                <h2>その他の金額で支援する</h2>
+                <h2>任意の金額で支援する</h2>
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="custom-content">
                 <div id="errorMessage" class="error-message"></div>
 
-                <div class="amount-grid">
-                    <button class="amount-btn" data-amount="500">500円</button>
-                    <button class="amount-btn" data-amount="1000">1,000円</button>
-                    <button class="amount-btn" data-amount="3000">3,000円</button>
-                    <button class="amount-btn" data-amount="5000">5,000円</button>
-                </div>
-                <div class="custom-amount">
-                    <label for="customAmount">任意の金額（100円〜1,000,000円）</label>
+                <div class="custom-amount" style="margin-top: 16px;">
+                    <label for="customAmount">金額を入力（100円〜1,000,000円）</label>
                     <div class="custom-input-wrapper" id="customWrapper">
-                        <input type="number" id="customAmount" min="100" max="1000000" step="100" placeholder="金額を入力">
+                        <input type="number" id="customAmount" min="100" max="1000000" step="100" placeholder="例: 2000">
                         <span class="currency-label">円</span>
                     </div>
                 </div>
@@ -527,7 +490,6 @@
         let selectedAmount = null;
 
         // DOM要素
-        const amountBtns = document.querySelectorAll('.amount-btn');
         const customInput = document.getElementById('customAmount');
         const customWrapper = document.getElementById('customWrapper');
         const providerBtns = document.querySelectorAll('.provider-btn');
@@ -538,27 +500,9 @@
         const params = new URLSearchParams(window.location.search);
         const source = params.get('source') || 'direct';
 
-        // プリセット金額ボタンのクリックハンドラ
-        amountBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // 他のボタンの選択解除
-                amountBtns.forEach(b => b.classList.remove('selected'));
-                customWrapper.classList.remove('selected');
-                customInput.value = '';
-
-                // このボタンを選択
-                btn.classList.add('selected');
-                selectedAmount = parseInt(btn.dataset.amount);
-                hideError();
-            });
-        });
-
-        // カスタム金額入力のハンドラ
+        // 金額入力のハンドラ
         customInput.addEventListener('input', () => {
             const value = parseInt(customInput.value);
-
-            // プリセットボタンの選択解除
-            amountBtns.forEach(b => b.classList.remove('selected'));
 
             if (value && value >= 100 && value <= 1000000) {
                 customWrapper.classList.add('selected');
@@ -568,10 +512,6 @@
                 customWrapper.classList.remove('selected');
                 selectedAmount = null;
             }
-        });
-
-        customInput.addEventListener('focus', () => {
-            amountBtns.forEach(b => b.classList.remove('selected'));
         });
 
         // 決済プロバイダボタンのクリックハンドラ
