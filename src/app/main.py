@@ -135,7 +135,10 @@ async def qr_payment_page(amount: int):
     if amount < 100 or amount > 1000000:
         return JSONResponse(
             status_code=400,
-            content={"error": "INVALID_AMOUNT", "message": "金額は100円〜1,000,000円の範囲で指定してください"}
+            content={
+                "error": "INVALID_AMOUNT",
+                "message": "金額は100円〜1,000,000円の範囲で指定してください",
+            },
         )
     return FileResponse(STATIC_DIR / "qr-payment.html")
 
