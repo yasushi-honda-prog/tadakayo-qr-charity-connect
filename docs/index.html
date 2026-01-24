@@ -46,6 +46,43 @@
             --shadow-glow: 0 0 20px var(--brand-glow);
         }
 
+        /* ===== LIGHT THEME ===== */
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f6f8fa;
+            --bg-tertiary: #eaeef2;
+            --bg-elevated: #d0d7de;
+
+            --text-primary: #1f2328;
+            --text-secondary: #57606a;
+            --text-muted: #8c959f;
+
+            --border: #d0d7de;
+            --border-light: #eaeef2;
+
+            --accent-blue: #0969da;
+            --accent-green: #1a7f37;
+            --accent-yellow: #9a6700;
+            --accent-purple: #8250df;
+            --accent-orange: #bc4c00;
+
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.16);
+        }
+
+        [data-theme="light"] code {
+            background: #eff1f3;
+            color: #cf222e;
+        }
+
+        [data-theme="light"] .hero h1 {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -709,7 +746,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .header-cta {
+            .header-cta .btn-demo {
                 display: none;
             }
         }
@@ -741,6 +778,44 @@
             z-index: 999;
             transition: width 0.1s;
         }
+
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border-color: var(--brand);
+        }
+
+        .theme-toggle .icon-sun {
+            display: none;
+        }
+
+        .theme-toggle .icon-moon {
+            display: block;
+        }
+
+        [data-theme="light"] .theme-toggle .icon-sun {
+            display: block;
+        }
+
+        [data-theme="light"] .theme-toggle .icon-moon {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -762,6 +837,10 @@
                 <span class="badge badge-demo">デモ版公開中</span>
             </div>
             <div class="header-cta">
+                <button class="theme-toggle" onclick="toggleTheme()" title="テーマ切り替え">
+                    <span class="icon-moon">🌙</span>
+                    <span class="icon-sun">☀️</span>
+                </button>
                 <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" class="btn-demo">
                     デモを試す →
                 </a>
@@ -1479,14 +1558,75 @@ mindmap
     </footer>
 
     <script>
+        // Theme management
+        function getPreferredTheme() {
+            const stored = localStorage.getItem('theme');
+            if (stored) return stored;
+            return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            // Reinitialize mermaid with new theme
+            updateMermaidTheme(theme);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            setTheme(next);
+        }
+
+        function updateMermaidTheme(theme) {
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: theme === 'light' ? 'default' : 'dark',
+                securityLevel: 'loose',
+                flowchart: { useMaxWidth: true },
+                sequence: { useMaxWidth: true },
+                gantt: { useMaxWidth: true }
+            });
+            // Re-render all mermaid diagrams
+            document.querySelectorAll('.mermaid').forEach((el, i) => {
+                const code = el.getAttribute('data-mermaid-src');
+                if (code) {
+                    el.innerHTML = code;
+                    el.removeAttribute('data-processed');
+                    mermaid.init(undefined, el);
+                }
+            });
+        }
+
+        // Initialize theme before page renders
+        (function() {
+            const theme = getPreferredTheme();
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'light' : 'dark');
+            }
+        });
+
         // Mermaid init
+        const currentTheme = getPreferredTheme();
         mermaid.initialize({
             startOnLoad: true,
-            theme: 'dark',
+            theme: currentTheme === 'light' ? 'default' : 'dark',
             securityLevel: 'loose',
             flowchart: { useMaxWidth: true },
             sequence: { useMaxWidth: true },
             gantt: { useMaxWidth: true }
+        });
+
+        // Store original mermaid source for re-rendering
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.mermaid').forEach(el => {
+                el.setAttribute('data-mermaid-src', el.textContent);
+            });
         });
 
         // Scroll progress
