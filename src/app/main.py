@@ -50,11 +50,25 @@ def init_services() -> None:
         repository = FirestoreDonationRepository(project_id=settings.project_id)
         logger.info("Using Firestore repository", project_id=settings.project_id)
 
-    # Initialize payment adapters (mock mode for now)
+    # Initialize payment adapters
     adapters = {
-        PaymentProvider.PAYPAY: PayPayAdapter(production_mode=False),
+        PaymentProvider.PAYPAY: PayPayAdapter(
+            api_key=settings.paypay_api_key or None,
+            api_secret=settings.paypay_api_secret or None,
+            merchant_id=settings.paypay_merchant_id or None,
+            production_mode=settings.paypay_production_mode,
+        ),
         PaymentProvider.RAKUTEN: RakutenPayAdapter(sandbox=True),
     }
+
+    # Log PayPay configuration status
+    if settings.paypay_api_key and settings.paypay_api_secret:
+        logger.info(
+            "PayPay configured with API credentials",
+            production_mode=settings.paypay_production_mode,
+        )
+    else:
+        logger.warning("PayPay running in mock mode (no API credentials)")
 
     # Create and set payment service
     payment_service = PaymentService(repository=repository, adapters=adapters)

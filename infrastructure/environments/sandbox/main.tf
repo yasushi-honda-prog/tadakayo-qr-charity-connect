@@ -59,6 +59,11 @@ module "cloud_run" {
   environment           = var.environment
   service_account_email = module.iam.cloud_run_service_account_email
   vpc_connector_id      = module.networking.vpc_connector_id
+
+  # Secret Manager secrets
+  paypay_api_key_secret_id     = module.secrets.paypay_api_key_secret_id
+  paypay_api_secret_secret_id  = module.secrets.paypay_api_secret_secret_id
+  paypay_merchant_id_secret_id = module.secrets.paypay_merchant_id_secret_id
 }
 
 # 出力
