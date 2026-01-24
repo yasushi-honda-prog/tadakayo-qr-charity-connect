@@ -123,6 +123,19 @@ async def cancel_page() -> FileResponse:
     return FileResponse(STATIC_DIR / "cancel.html")
 
 
+@app.get("/mock/payment/{order_id}")
+async def mock_payment_page(order_id: str) -> FileResponse:
+    """Serve the mock payment simulation page.
+
+    This page simulates the PayPay checkout experience when running
+    in mock mode (without API credentials).
+
+    Args:
+        order_id: The mock order ID from the checkout session
+    """
+    return FileResponse(STATIC_DIR / "mock-payment.html")
+
+
 @app.get("/qr/{amount}", response_model=None)
 async def qr_payment_page(amount: int) -> Response:
     """Serve the QR payment page for a fixed amount.
