@@ -9,6 +9,7 @@ import hmac
 import json
 import uuid
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import structlog
 
@@ -133,7 +134,7 @@ class RakutenPayAdapter(PaymentProviderAdapter):
         )
         return WebhookVerificationResult(valid=True, event=event)
 
-    def normalize_event(self, event: dict) -> NormalizedEvent:
+    def normalize_event(self, event: dict[str, Any]) -> NormalizedEvent:
         """Normalize Rakuten Pay webhook event to common format.
 
         Rakuten Pay event types:

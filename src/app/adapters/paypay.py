@@ -10,6 +10,7 @@ import hmac
 import json
 import uuid
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import paypayopa
 import structlog
@@ -229,7 +230,7 @@ class PayPayAdapter(PaymentProviderAdapter):
         )
         return WebhookVerificationResult(valid=True, event=event)
 
-    def normalize_event(self, event: dict) -> NormalizedEvent:
+    def normalize_event(self, event: dict[str, Any]) -> NormalizedEvent:
         """Normalize PayPay webhook event to common format.
 
         PayPay webhook states (Web Cashier):

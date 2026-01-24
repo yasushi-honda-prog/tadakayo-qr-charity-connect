@@ -203,7 +203,7 @@ class FirestoreDonationRepository(DonationRepositoryBase):
 class InMemoryDonationRepository(DonationRepositoryBase):
     """In-memory implementation for testing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._donations: dict[str, Donation] = {}
         self._events: dict[str, PaymentEvent] = {}
 
