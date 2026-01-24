@@ -1,9 +1,8 @@
 """Donation API endpoints."""
 
+import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
-
-import structlog
 
 from app.models.donation import (
     CheckoutRequest,
@@ -66,7 +65,7 @@ async def create_checkout(
         raise HTTPException(
             status_code=400 if e.code == "INVALID_ARGUMENT" else 503,
             detail={"error": e.code, "message": e.message},
-        )
+        ) from e
 
 
 @router.get("/donations/{donation_id}", response_model=DonationResponse)
@@ -77,11 +76,11 @@ async def get_donation(
     """Get donation status by ID."""
     try:
         return await service.get_donation(donation_id)
-    except DonationNotFoundError:
+    except DonationNotFoundError as e:
         raise HTTPException(
             status_code=404,
             detail={"error": "DONATION_NOT_FOUND", "message": f"Donation not found: {donation_id}"},
-        )
+        ) from e
 
 
 @router.post("/webhooks/paypay")

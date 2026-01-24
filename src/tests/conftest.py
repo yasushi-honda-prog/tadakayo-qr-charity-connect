@@ -5,11 +5,11 @@ from fastapi.testclient import TestClient
 
 from app.adapters.paypay import PayPayAdapter
 from app.adapters.rakuten import RakutenPayAdapter
-from app.main import app, init_services
+from app.api.donations import set_payment_service
+from app.main import app
 from app.models.donation import PaymentProvider
 from app.repositories.donation import InMemoryDonationRepository
 from app.services.payment import PaymentService
-from app.api.donations import set_payment_service
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def paypay_adapter():
     """Create a PayPay adapter for testing."""
     return PayPayAdapter(
         webhook_secret="test_paypay_secret",
-        sandbox=True,
+        production_mode=False,
     )
 
 

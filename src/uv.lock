@@ -646,6 +646,19 @@ wheels = [
 ]
 
 [[package]]
+name = "paypayopa"
+version = "1.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyjwt" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/73/e0/69ff980ddecc483acc9a1241226fb2e54d1a7bce1d7f3693a1aeffcf88cb/paypayopa-1.7.tar.gz", hash = "sha256:71dad7bdf34b23d0ad314b0798ca8aa279b3743c9a0cf158bc90104b51ddb722", size = 37666, upload-time = "2022-03-31T03:41:12.55Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/76/98/9bb881266733d7c462cbff7ef6288a8298f87b17c011036e260aab7ebdc8/paypayopa-1.7-py3-none-any.whl", hash = "sha256:9a94835303c2c12c516a598ac415010c1af968f3df1dd2314c8eeb6930fbc6c5", size = 25350, upload-time = "2022-03-31T03:41:10.235Z" },
+]
+
+[[package]]
 name = "pluggy"
 version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -838,6 +851,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pyjwt"
+version = "2.10.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e7/46/bd74733ff231675599650d3e47f361794b22ef3e3770998dda30d3b63726/pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953", size = 87785, upload-time = "2024-11-28T03:43:29.933Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/61/ad/689f02752eeec26aed679477e80e632ef1b682313be70793d798c1d5fc8f/PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb", size = 22997, upload-time = "2024-11-28T03:43:27.893Z" },
+]
+
+[[package]]
 name = "pytest"
 version = "9.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -953,6 +975,7 @@ dependencies = [
     { name = "google-cloud-firestore" },
     { name = "google-cloud-secret-manager" },
     { name = "httpx" },
+    { name = "paypayopa" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "structlog" },
@@ -975,6 +998,7 @@ requires-dist = [
     { name = "google-cloud-secret-manager", specifier = ">=2.21" },
     { name = "httpx", specifier = ">=0.28" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.13" },
+    { name = "paypayopa", specifier = ">=1.0" },
     { name = "pydantic", specifier = ">=2.10" },
     { name = "pydantic-settings", specifier = ">=2.7" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3" },

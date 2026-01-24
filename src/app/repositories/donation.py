@@ -1,11 +1,11 @@
 """Donation repository for Firestore operations."""
 
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import structlog
-from google.cloud import firestore
+from google.cloud import firestore  # type: ignore[attr-defined]
 
 from app.models.donation import Donation, DonationStatus, PaymentEvent, PaymentProvider
 
@@ -118,9 +118,10 @@ class FirestoreDonationRepository(DonationRepositoryBase):
         self, provider: PaymentProvider, provider_order_id: str
     ) -> Donation | None:
         """Get donation by provider order ID."""
+        provider_val = provider.value if isinstance(provider, PaymentProvider) else provider
         query = (
             self._db.collection(self._donations_collection)
-            .where("provider", "==", provider.value if isinstance(provider, PaymentProvider) else provider)
+            .where("provider", "==", provider_val)
             .where("providerOrderId", "==", provider_order_id)
             .limit(1)
         )
@@ -140,7 +141,7 @@ class FirestoreDonationRepository(DonationRepositoryBase):
 
         update_data: dict[str, Any] = {
             "status": status.value if isinstance(status, DonationStatus) else status,
-            "updatedAt": datetime.now(timezone.utc),
+            "updatedAt": datetime.now(UTC),
         }
 
         if completed_at:
@@ -158,12 +159,20 @@ class FirestoreDonationRepository(DonationRepositoryBase):
 
     async def save_payment_event(self, event: PaymentEvent) -> PaymentEvent:
         """Save a payment webhook event to Firestore."""
+        provider_val = (
+            event.provider.value if isinstance(event.provider, PaymentProvider)
+            else event.provider
+        )
+        status_val = (
+            event.status.value if isinstance(event.status, DonationStatus)
+            else event.status
+        )
         doc_ref = self._db.collection(self._events_collection).document(event.id)
         doc_ref.set({
-            "provider": event.provider.value if isinstance(event.provider, PaymentProvider) else event.provider,
+            "provider": provider_val,
             "providerEventId": event.provider_event_id,
             "providerOrderId": event.provider_order_id,
-            "status": event.status.value if isinstance(event.status, DonationStatus) else event.status,
+            "status": status_val,
             "receivedAt": event.received_at,
             "rawPayload": event.raw_payload,
             "signatureValid": event.signature_valid,
@@ -179,9 +188,10 @@ class FirestoreDonationRepository(DonationRepositoryBase):
 
     async def event_exists(self, provider: PaymentProvider, provider_event_id: str) -> bool:
         """Check if a payment event already exists."""
+        provider_val = provider.value if isinstance(provider, PaymentProvider) else provider
         query = (
             self._db.collection(self._events_collection)
-            .where("provider", "==", provider.value if isinstance(provider, PaymentProvider) else provider)
+            .where("provider", "==", provider_val)
             .where("providerEventId", "==", provider_event_id)
             .limit(1)
         )
@@ -193,7 +203,7 @@ class FirestoreDonationRepository(DonationRepositoryBase):
 class InMemoryDonationRepository(DonationRepositoryBase):
     """In-memory implementation for testing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._donations: dict[str, Donation] = {}
         self._events: dict[str, PaymentEvent] = {}
 
@@ -209,7 +219,8 @@ class InMemoryDonationRepository(DonationRepositoryBase):
     ) -> Donation | None:
         provider_val = provider.value if isinstance(provider, PaymentProvider) else provider
         for donation in self._donations.values():
-            if donation.provider == provider_val and donation.provider_order_id == provider_order_id:
+            if (donation.provider == provider_val
+                    and donation.provider_order_id == provider_order_id):
                 return donation
         return None
 
@@ -224,7 +235,7 @@ class InMemoryDonationRepository(DonationRepositoryBase):
         updated = donation.model_copy(
             update={
                 "status": status_val,
-                "updated_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(UTC),
                 "completed_at": completed_at,
             }
         )

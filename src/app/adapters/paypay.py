@@ -1,15 +1,18 @@
 """PayPay payment provider adapter.
 
-This is a mock implementation for development.
-Replace with actual PayPay API integration when credentials are available.
+Uses the official PayPay OPA SDK for API integration.
+https://github.com/paypay/paypayopa-sdk-python
 """
 
+import contextlib
 import hashlib
 import hmac
 import json
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
+import paypayopa
 import structlog
 
 from app.adapters.base import (
@@ -24,13 +27,12 @@ from app.models.donation import DonationStatus, PaymentProvider
 
 logger = structlog.get_logger()
 
-# Mock configuration - replace with actual config when available
-MOCK_PAYPAY_BASE_URL = "https://sandbox.paypay.ne.jp"
-MOCK_WEBHOOK_SECRET = "mock_paypay_webhook_secret"
+# Webhook secret for signature verification
+DEFAULT_WEBHOOK_SECRET = "mock_paypay_webhook_secret"
 
 
 class PayPayAdapter(PaymentProviderAdapter):
-    """PayPay payment provider adapter (mock implementation)."""
+    """PayPay payment provider adapter using official SDK."""
 
     def __init__(
         self,
@@ -38,49 +40,50 @@ class PayPayAdapter(PaymentProviderAdapter):
         api_secret: str | None = None,
         merchant_id: str | None = None,
         webhook_secret: str | None = None,
-        sandbox: bool = True,
+        production_mode: bool = False,
     ):
         self._api_key = api_key
         self._api_secret = api_secret
         self._merchant_id = merchant_id
-        self._webhook_secret = webhook_secret or MOCK_WEBHOOK_SECRET
-        self._sandbox = sandbox
-        self._base_url = MOCK_PAYPAY_BASE_URL if sandbox else "https://api.paypay.ne.jp"
+        self._webhook_secret = webhook_secret or DEFAULT_WEBHOOK_SECRET
+        self._production_mode = production_mode
+
+        # Initialize PayPay client if credentials are provided
+        self._client: paypayopa.Client | None = None
+        if api_key and api_secret:
+            self._client = paypayopa.Client(
+                auth=(api_key, api_secret),
+                production_mode=production_mode,
+            )
+            if merchant_id:
+                self._client.set_assume_merchant(merchant_id)
+            logger.info(
+                "PayPay client initialized",
+                production_mode=production_mode,
+                has_merchant_id=bool(merchant_id),
+            )
 
     @property
     def provider_name(self) -> PaymentProvider:
         return PaymentProvider.PAYPAY
 
-    async def create_checkout_session(
-        self, input: CheckoutSessionInput
-    ) -> CheckoutSessionResult:
-        """Create a PayPay checkout session (mock implementation).
-
-        In production, this will call PayPay's Create a Code API.
-        """
-        logger.info(
-            "Creating PayPay checkout session",
-            order_id=input.order_id,
-            amount=input.amount,
-            sandbox=self._sandbox,
-        )
-
-        # Mock implementation - generate fake redirect URL
+    def _create_mock_session(self, input: CheckoutSessionInput) -> CheckoutSessionResult:
+        """Create a mock checkout session for testing without API credentials."""
         provider_order_id = f"paypay_{uuid.uuid4().hex[:12]}"
-        expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+        expires_at = datetime.now(UTC) + timedelta(hours=1)
 
-        # In production, this would be the actual PayPay payment URL
+        # Mock sandbox URL
+        base_url = "https://sandbox.paypay.ne.jp"
         redirect_url = (
-            f"{self._base_url}/checkout/{provider_order_id}"
+            f"{base_url}/checkout/{provider_order_id}"
             f"?amount={input.amount}"
             f"&return_url={input.return_url}"
         )
 
         logger.info(
-            "PayPay checkout session created",
+            "PayPay mock checkout session created",
             order_id=input.order_id,
             provider_order_id=provider_order_id,
-            expires_at=expires_at.isoformat(),
         )
 
         return CheckoutSessionResult(
@@ -89,15 +92,108 @@ class PayPayAdapter(PaymentProviderAdapter):
             expires_at=expires_at,
         )
 
+    async def create_checkout_session(
+        self, input: CheckoutSessionInput
+    ) -> CheckoutSessionResult:
+        """Create a PayPay checkout session using the SDK.
+
+        Calls PayPay's Create a Code API (POST /v2/codes).
+        If no API credentials are configured, returns a mock response for testing.
+        """
+        logger.info(
+            "Creating PayPay checkout session",
+            order_id=input.order_id,
+            amount=input.amount,
+            production_mode=self._production_mode,
+        )
+
+        # Mock mode: return mock response when no credentials
+        if not self._client:
+            return self._create_mock_session(input)
+
+        # Prepare request for PayPay SDK
+        request = {
+            "merchantPaymentId": input.order_id,
+            "codeType": "ORDER_QR",
+            "redirectUrl": input.return_url,
+            "redirectType": "WEB_LINK",
+            "amount": {
+                "amount": input.amount,
+                "currency": input.currency,
+            },
+        }
+
+        # Add optional description
+        if input.description:
+            request["orderDescription"] = input.description
+
+        try:
+            response = self._client.Code.create_qr_code(request)
+
+            # Check response status
+            if response.get("resultInfo", {}).get("code") != "SUCCESS":
+                error_message = response.get("resultInfo", {}).get(
+                    "message", "Unknown error"
+                )
+                logger.error(
+                    "PayPay create_qr_code failed",
+                    error=error_message,
+                    response=response,
+                )
+                raise ProviderError(
+                    provider=self.provider_name,
+                    message=f"Failed to create checkout session: {error_message}",
+                )
+
+            data = response.get("data", {})
+            redirect_url = data.get("url")
+            code_id = data.get("codeId")
+            expiry_date = data.get("expiryDate")
+
+            if not redirect_url:
+                raise ProviderError(
+                    provider=self.provider_name,
+                    message="No redirect URL in response",
+                )
+
+            # Parse expiry date
+            expires_at = datetime.now(UTC) + timedelta(hours=1)
+            if expiry_date:
+                with contextlib.suppress(ValueError, TypeError):
+                    # PayPay returns Unix timestamp in milliseconds
+                    expires_at = datetime.fromtimestamp(expiry_date / 1000, tz=UTC)
+
+            logger.info(
+                "PayPay checkout session created",
+                order_id=input.order_id,
+                code_id=code_id,
+                expires_at=expires_at.isoformat(),
+            )
+
+            return CheckoutSessionResult(
+                redirect_url=redirect_url,
+                provider_order_id=code_id or input.order_id,
+                expires_at=expires_at,
+            )
+
+        except Exception as e:
+            logger.error("PayPay SDK error", error=str(e))
+            raise ProviderError(
+                provider=self.provider_name,
+                message=f"PayPay API error: {e}",
+            ) from e
+
     async def verify_webhook(
         self, headers: dict[str, str], body: bytes
     ) -> WebhookVerificationResult:
-        """Verify PayPay webhook signature (mock implementation).
+        """Verify PayPay webhook signature.
 
         PayPay uses HMAC-SHA256 for webhook signature verification.
         Header: X-PAYPAY-SIGNATURE
         """
-        signature = headers.get("x-paypay-signature") or headers.get("X-PAYPAY-SIGNATURE")
+        signature = headers.get("x-paypay-signature") or headers.get(
+            "X-PAYPAY-SIGNATURE"
+        )
 
         if not signature:
             return WebhookVerificationResult(
@@ -127,33 +223,44 @@ class PayPayAdapter(PaymentProviderAdapter):
                 error=f"Invalid JSON payload: {e}",
             )
 
-        logger.info("PayPay webhook signature verified", event_type=event.get("notification_type"))
+        logger.info(
+            "PayPay webhook signature verified",
+            notification_type=event.get("notification_type"),
+            state=event.get("state"),
+        )
         return WebhookVerificationResult(valid=True, event=event)
 
-    def normalize_event(self, event: dict) -> NormalizedEvent:
+    def normalize_event(self, event: dict[str, Any]) -> NormalizedEvent:
         """Normalize PayPay webhook event to common format.
 
-        PayPay notification types:
+        PayPay webhook states (Web Cashier):
+        - CREATED: Payment created
         - AUTHORIZED: Payment authorized
-        - CAPTURED: Payment captured (completed)
-        - FAILED: Payment failed
-        - REFUNDED: Payment refunded
+        - COMPLETED: Payment completed
         - EXPIRED: Payment expired
+        - CANCELED: Payment canceled
+
+        Also supports legacy notification_type field for backward compatibility.
         """
-        notification_type = event.get("notification_type", "")
-        merchant_payment_id = event.get("merchant_payment_id", "")
+        # Try state field first (Web Cashier), then notification_type (legacy)
+        state = event.get("state", "") or event.get("notification_type", "")
+        order_id = event.get("order_id", "") or event.get("merchant_payment_id", "")
         payment_id = event.get("payment_id", "")
 
         status_map = {
+            # Web Cashier states
+            "CREATED": DonationStatus.PENDING,
             "AUTHORIZED": DonationStatus.PENDING,
-            "CAPTURED": DonationStatus.COMPLETED,
             "COMPLETED": DonationStatus.COMPLETED,
+            "EXPIRED": DonationStatus.EXPIRED,
+            "CANCELED": DonationStatus.FAILED,
+            # Legacy notification types
+            "CAPTURED": DonationStatus.COMPLETED,
             "FAILED": DonationStatus.FAILED,
             "REFUNDED": DonationStatus.REFUNDED,
-            "EXPIRED": DonationStatus.EXPIRED,
         }
 
-        status = status_map.get(notification_type, DonationStatus.PENDING)
+        status = status_map.get(state, DonationStatus.PENDING)
 
         # Mask PII from raw payload
         masked_payload = {
@@ -163,6 +270,6 @@ class PayPayAdapter(PaymentProviderAdapter):
         return NormalizedEvent(
             status=status,
             provider_event_id=payment_id or f"evt_{uuid.uuid4().hex[:8]}",
-            provider_order_id=merchant_payment_id,
+            provider_order_id=order_id,
             raw_payload=masked_payload,
         )

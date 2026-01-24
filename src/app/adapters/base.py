@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any
 
 from app.models.donation import DonationStatus, PaymentProvider
 
@@ -33,7 +34,7 @@ class WebhookVerificationResult:
     """Result of webhook signature verification."""
 
     valid: bool
-    event: dict | None = None
+    event: dict[str, Any] | None = None
     error: str | None = None
 
 
@@ -44,7 +45,7 @@ class NormalizedEvent:
     status: DonationStatus
     provider_event_id: str
     provider_order_id: str
-    raw_payload: dict
+    raw_payload: dict[str, Any]
 
 
 class PaymentProviderAdapter(ABC):
@@ -89,7 +90,7 @@ class PaymentProviderAdapter(ABC):
         ...
 
     @abstractmethod
-    def normalize_event(self, event: dict) -> NormalizedEvent:
+    def normalize_event(self, event: dict[str, Any]) -> NormalizedEvent:
         """Normalize provider-specific event to common format.
 
         Args:
@@ -106,5 +107,6 @@ class ProviderError(Exception):
 
     def __init__(self, provider: PaymentProvider, message: str, code: str | None = None):
         self.provider = provider
+        self.message = message
         self.code = code
         super().__init__(f"[{provider.value}] {message}")

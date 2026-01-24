@@ -1,21 +1,25 @@
 """FastAPI application entry point."""
 
-import os
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import AsyncGenerator
 
 import structlog
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.config import settings
 from app.adapters.paypay import PayPayAdapter
 from app.adapters.rakuten import RakutenPayAdapter
-from app.api.donations import router as donations_router, set_payment_service
+from app.api.donations import router as donations_router
+from app.api.donations import set_payment_service
+from app.config import settings
 from app.models.donation import PaymentProvider
-from app.repositories.donation import FirestoreDonationRepository, InMemoryDonationRepository
+from app.repositories.donation import (
+    DonationRepositoryBase,
+    FirestoreDonationRepository,
+    InMemoryDonationRepository,
+)
 from app.services.payment import PaymentService
 
 # Configure structured logging
@@ -38,6 +42,7 @@ logger = structlog.get_logger()
 def init_services() -> None:
     """Initialize application services."""
     # Use in-memory repository for sandbox, Firestore for production
+    repository: DonationRepositoryBase
     if settings.environment == "sandbox":
         repository = InMemoryDonationRepository()
         logger.info("Using in-memory repository for sandbox environment")
@@ -47,7 +52,7 @@ def init_services() -> None:
 
     # Initialize payment adapters (mock mode for now)
     adapters = {
-        PaymentProvider.PAYPAY: PayPayAdapter(sandbox=True),
+        PaymentProvider.PAYPAY: PayPayAdapter(production_mode=False),
         PaymentProvider.RAKUTEN: RakutenPayAdapter(sandbox=True),
     }
 
@@ -116,7 +121,7 @@ async def root() -> dict[str, str]:
 
 
 @app.exception_handler(Exception)
-async def global_exception_handler(request, exc: Exception) -> JSONResponse:
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Global exception handler."""
     logger.error("Unhandled exception", error=str(exc), path=request.url.path)
     return JSONResponse(

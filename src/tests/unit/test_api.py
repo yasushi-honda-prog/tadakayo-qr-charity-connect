@@ -3,6 +3,7 @@
 import hashlib
 import hmac
 import json
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -20,7 +21,7 @@ def client():
     """Create a test client with initialized services."""
     repository = InMemoryDonationRepository()
     adapters = {
-        PaymentProvider.PAYPAY: PayPayAdapter(webhook_secret="test_secret", sandbox=True),
+        PaymentProvider.PAYPAY: PayPayAdapter(webhook_secret="test_secret", production_mode=False),
         PaymentProvider.RAKUTEN: RakutenPayAdapter(webhook_secret="test_secret", sandbox=True),
     }
     service = PaymentService(repository=repository, adapters=adapters)
@@ -129,8 +130,8 @@ class TestWebhookEndpoints:
 
     def test_paypay_webhook_valid(self, client):
         """Test PayPay webhook with valid signature."""
-        # Create a donation first
-        create_response = client.post(
+        # Create a donation first (response unused, just setting up state)
+        client.post(
             "/api/donations/checkout",
             json={
                 "amount": 1000,

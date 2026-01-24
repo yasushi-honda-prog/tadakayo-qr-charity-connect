@@ -3,6 +3,7 @@
 import hashlib
 import hmac
 import json
+
 import pytest
 
 from app.adapters.paypay import PayPayAdapter
@@ -31,8 +32,12 @@ class TestPaymentService:
     @pytest.fixture
     def service(self, repository):
         adapters = {
-            PaymentProvider.PAYPAY: PayPayAdapter(webhook_secret="test_secret", sandbox=True),
-            PaymentProvider.RAKUTEN: RakutenPayAdapter(webhook_secret="test_secret", sandbox=True),
+            PaymentProvider.PAYPAY: PayPayAdapter(
+                webhook_secret="test_secret", production_mode=False
+            ),
+            PaymentProvider.RAKUTEN: RakutenPayAdapter(
+                webhook_secret="test_secret", sandbox=True
+            ),
         }
         return PaymentService(repository=repository, adapters=adapters)
 
