@@ -43,6 +43,7 @@ ignore = ["B008"]  # Allow Depends() in FastAPI endpoint defaults
 python_version = "3.11"
 strict = true
 ignore_missing_imports = true
+warn_unused_ignores = false  # google-cloud stubs vary between environments
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

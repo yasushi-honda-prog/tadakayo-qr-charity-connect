@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import structlog
-from google.cloud import firestore
+from google.cloud import firestore  # type: ignore[attr-defined]
 
 from app.models.donation import Donation, DonationStatus, PaymentEvent, PaymentProvider
 
