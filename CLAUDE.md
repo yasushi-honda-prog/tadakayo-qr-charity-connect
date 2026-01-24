@@ -41,6 +41,35 @@ QRコード → 既存HP / ランディングページ → Cloud Run → PayPay/
 3. 決済API連携（セッション作成、Webhook受信、署名検証）
 4. QRコード作成と流入元パラメータの付与
 
+## 開発コマンド
+
+```bash
+# srcディレクトリで実行
+cd src
+
+# テスト実行
+uv run pytest tests/ -v
+
+# lint
+uv run ruff check app/
+
+# 型チェック
+uv run mypy app/
+
+# ローカル起動
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+## ドキュメント参照ガイド
+
+| タスク | 参照先 |
+|--------|--------|
+| API仕様確認 | `docs/api-spec.md` |
+| 進捗確認 | `docs/roadmap.md` |
+| 設計判断の経緯 | `docs/adr/` |
+| 環境変数・シークレット | `docs/env-secrets.md` |
+| データモデル | `docs/data-model.md` |
+
 ## 開発ルール
 
 ### ドキュメント同期

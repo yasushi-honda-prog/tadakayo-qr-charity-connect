@@ -11,12 +11,41 @@
 
 | メソッド | パス | 説明 |
 |---------|------|------|
+| GET | `/qr/{amount}` | 固定金額QRコード表示ページ |
 | POST | `/api/donations/checkout` | 寄付セッション作成・決済画面URLを返す |
 | GET | `/api/donations/{donationId}` | 寄付状態の取得（フロント表示用） |
 | POST | `/api/webhooks/paypay` | PayPayのWebhook受信 |
 | POST | `/api/webhooks/rakuten` | 楽天ペイのWebhook受信 |
 
 ## リクエスト/レスポンス
+
+### GET /qr/{amount}
+
+固定金額のPayPay決済QRコードを表示するページ。チラシ・名刺用のQRコード発行に使用。
+
+**パスパラメータ**
+- `amount`: 支援金額（100〜1,000,000円）
+
+**レスポンス**
+- 成功時: QRコード表示HTML（`qr-payment.html`）
+- エラー時（金額範囲外）:
+```json
+{
+  "error": "INVALID_AMOUNT",
+  "message": "金額は100円〜1,000,000円の範囲で指定してください"
+}
+```
+
+**フロー**
+1. ページ読み込み時にJavaScriptで `/api/donations/checkout` を呼び出し
+2. 返却された `redirect_url` をQRコード化して表示
+3. ユーザーがQRスキャン → PayPay決済ページに直接遷移
+
+**用途例**
+- `/qr/500` - 500円支援QRコード
+- `/qr/1000` - 1,000円支援QRコード
+
+---
 
 ### POST /api/donations/checkout
 

@@ -32,12 +32,15 @@
 - [x] Firestoreへの支援記録保存（InMemory + Firestore両対応）
 - [x] サンクスページ表示（`/thanks`）
 - [x] キャンセルページ表示（`/cancel`）
+- [x] 固定金額QRコード機能（`/qr/{amount}`）
+  - QRスキャン → PayPay決済ページ直接遷移
+  - チラシ・名刺用の印刷用QRコード発行
 
 **実装済みコンポーネント:**
 - `src/app/adapters/` - 決済プロバイダアダプタ（PayPay/楽天ペイ）
 - `src/app/services/payment.py` - 決済サービス
 - `src/app/api/donations.py` - APIエンドポイント
-- `src/app/static/` - 静的ページ（donate.html, thanks.html, cancel.html）
+- `src/app/static/` - 静的ページ（donate.html, thanks.html, cancel.html, qr-payment.html）
 - `src/tests/unit/` - ユニットテスト30件
 
 ## 第4段階: 複数決済対応
