@@ -7,6 +7,7 @@ from pathlib import Path
 import structlog
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
+from starlette.responses import Response
 from fastapi.staticfiles import StaticFiles
 
 from app.adapters.paypay import PayPayAdapter
@@ -123,7 +124,7 @@ async def cancel_page() -> FileResponse:
 
 
 @app.get("/qr/{amount}", response_model=None)
-async def qr_payment_page(amount: int):
+async def qr_payment_page(amount: int) -> Response:
     """Serve the QR payment page for a fixed amount.
 
     The page will create a PayPay checkout session and display
