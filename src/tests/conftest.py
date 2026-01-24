@@ -23,7 +23,7 @@ def paypay_adapter():
     """Create a PayPay adapter for testing."""
     return PayPayAdapter(
         webhook_secret="test_paypay_secret",
-        sandbox=True,
+        production_mode=False,
     )
 
 

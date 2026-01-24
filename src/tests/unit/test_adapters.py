@@ -16,11 +16,11 @@ class TestPayPayAdapter:
 
     @pytest.fixture
     def adapter(self):
-        return PayPayAdapter(webhook_secret="test_secret", sandbox=True)
+        return PayPayAdapter(webhook_secret="test_secret", production_mode=False)
 
     @pytest.mark.asyncio
-    async def test_create_checkout_session(self, adapter):
-        """Test creating a checkout session."""
+    async def test_create_checkout_session_mock_mode(self, adapter):
+        """Test creating a checkout session in mock mode (no API credentials)."""
         input = CheckoutSessionInput(
             amount=1000,
             currency="JPY",

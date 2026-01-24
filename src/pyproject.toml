@@ -12,6 +12,7 @@ dependencies = [
     "google-cloud-secret-manager>=2.21",
     "httpx>=0.28",
     "structlog>=24.4",
+    "paypayopa>=1.0",
 ]
 
 [project.optional-dependencies]

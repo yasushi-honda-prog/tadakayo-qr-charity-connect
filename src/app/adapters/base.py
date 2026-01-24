@@ -106,5 +106,6 @@ class ProviderError(Exception):
 
     def __init__(self, provider: PaymentProvider, message: str, code: str | None = None):
         self.provider = provider
+        self.message = message
         self.code = code
         super().__init__(f"[{provider.value}] {message}")
