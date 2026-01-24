@@ -1,6 +1,7 @@
 import React from "react";
 import { Composition } from "remotion";
 import { ShortVideo } from "./ShortVideo";
+import { HorizontalVideo } from "./HorizontalVideo";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -15,10 +16,10 @@ export const RemotionRoot: React.FC = () => {
         height={1920}
       />
 
-      {/* Preview composition - 16:9 horizontal for desktop preview */}
+      {/* Horizontal video - 16:9 for website hero section */}
       <Composition
-        id="TadakayoShortPreview"
-        component={ShortVideo}
+        id="TadakayoHorizontal"
+        component={HorizontalVideo}
         durationInFrames={360}
         fps={30}
         width={1920}
