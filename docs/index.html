@@ -638,13 +638,163 @@
         }
 
         /* ===== MERMAID ===== */
-        .mermaid {
+        .mermaid-wrapper {
+            position: relative;
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 32px;
             margin: 24px 0;
             overflow-x: auto;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mermaid-wrapper:hover {
+            border-color: var(--brand);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .mermaid-wrapper::after {
+            content: '🔍 クリックで拡大';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .mermaid-wrapper:hover::after {
+            opacity: 1;
+        }
+
+        .mermaid {
+            background: transparent;
+        }
+
+        /* ===== DIAGRAM MODAL ===== */
+        .diagram-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+        }
+
+        .diagram-modal.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .modal-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.15s;
+        }
+
+        .modal-btn:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border-color: var(--brand);
+        }
+
+        .modal-btn-close {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: white;
+        }
+
+        .modal-btn-close:hover {
+            background: var(--brand-dark);
+        }
+
+        .zoom-level {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+        }
+
+        .modal-body:active {
+            cursor: grabbing;
+        }
+
+        .diagram-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+            padding: 48px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .diagram-container svg {
+            max-width: none !important;
+            height: auto !important;
+        }
+
+        .modal-hint {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            pointer-events: none;
         }
 
         /* ===== LISTS ===== */
@@ -1545,6 +1695,24 @@ mindmap
         </div>
     </main>
 
+    <!-- DIAGRAM MODAL -->
+    <div class="diagram-modal" id="diagramModal">
+        <div class="modal-header">
+            <span class="modal-title">ダイアグラム</span>
+            <div class="modal-controls">
+                <button class="modal-btn" onclick="resetDiagram()" title="リセット">↺</button>
+                <button class="modal-btn" onclick="zoomOut()" title="縮小">−</button>
+                <span class="zoom-level" id="zoomLevel">100%</span>
+                <button class="modal-btn" onclick="zoomIn()" title="拡大">+</button>
+                <button class="modal-btn modal-btn-close" onclick="closeModal()" title="閉じる">✕</button>
+            </div>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <div class="diagram-container" id="diagramContainer"></div>
+            <div class="modal-hint">ドラッグで移動 / スクロールで拡大縮小 / Escで閉じる</div>
+        </div>
+    </div>
+
     <!-- FOOTER -->
     <footer class="site-footer">
         <div class="footer-content">
@@ -1671,6 +1839,170 @@ mindmap
                     document.getElementById('sidebar').classList.remove('open');
                 }
             });
+        });
+
+        // ===== DIAGRAM MODAL =====
+        let currentZoom = 1;
+        let panX = 0;
+        let panY = 0;
+        let isDragging = false;
+        let startX, startY;
+
+        // Wrap mermaid elements and add click handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.mermaid').forEach((el, index) => {
+                    // Wrap in container if not already
+                    if (!el.parentElement.classList.contains('mermaid-wrapper')) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'mermaid-wrapper';
+                        wrapper.setAttribute('data-diagram-index', index);
+                        el.parentNode.insertBefore(wrapper, el);
+                        wrapper.appendChild(el);
+                    }
+
+                    // Add click handler to wrapper
+                    el.parentElement.addEventListener('click', () => {
+                        openDiagramModal(el);
+                    });
+                });
+            }, 1000); // Wait for mermaid to render
+        });
+
+        function openDiagramModal(mermaidEl) {
+            const modal = document.getElementById('diagramModal');
+            const container = document.getElementById('diagramContainer');
+
+            // Clone the SVG content
+            const svg = mermaidEl.querySelector('svg');
+            if (svg) {
+                container.innerHTML = svg.outerHTML;
+            } else {
+                container.innerHTML = mermaidEl.innerHTML;
+            }
+
+            // Reset view
+            currentZoom = 1;
+            panX = 0;
+            panY = 0;
+            updateDiagramTransform();
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('diagramModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom + 0.25, 4);
+            updateDiagramTransform();
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom - 0.25, 0.25);
+            updateDiagramTransform();
+        }
+
+        function resetDiagram() {
+            currentZoom = 1;
+            panX = 0;
+            panY = 0;
+            updateDiagramTransform();
+        }
+
+        function updateDiagramTransform() {
+            const container = document.getElementById('diagramContainer');
+            container.style.transform = `translate(calc(-50% + ${panX}px), calc(-50% + ${panY}px)) scale(${currentZoom})`;
+            document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
+        }
+
+        // Mouse wheel zoom
+        document.getElementById('modalBody').addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                currentZoom = Math.min(currentZoom + 0.1, 4);
+            } else {
+                currentZoom = Math.max(currentZoom - 0.1, 0.25);
+            }
+            updateDiagramTransform();
+        });
+
+        // Pan with mouse drag
+        document.getElementById('modalBody').addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            updateDiagramTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Touch support for mobile
+        let lastTouchDistance = 0;
+
+        document.getElementById('modalBody').addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - panX;
+                startY = e.touches[0].clientY - panY;
+            } else if (e.touches.length === 2) {
+                lastTouchDistance = getTouchDistance(e.touches);
+            }
+        });
+
+        document.getElementById('modalBody').addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1 && isDragging) {
+                panX = e.touches[0].clientX - startX;
+                panY = e.touches[0].clientY - startY;
+                updateDiagramTransform();
+            } else if (e.touches.length === 2) {
+                const distance = getTouchDistance(e.touches);
+                const delta = distance - lastTouchDistance;
+                currentZoom = Math.min(Math.max(currentZoom + delta * 0.005, 0.25), 4);
+                lastTouchDistance = distance;
+                updateDiagramTransform();
+            }
+        });
+
+        document.getElementById('modalBody').addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        function getTouchDistance(touches) {
+            return Math.hypot(
+                touches[0].clientX - touches[1].clientX,
+                touches[0].clientY - touches[1].clientY
+            );
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Close on backdrop click
+        document.getElementById('diagramModal').addEventListener('click', (e) => {
+            if (e.target.id === 'diagramModal' || e.target.classList.contains('modal-body')) {
+                // Don't close if clicking on the diagram itself
+                if (!e.target.closest('.diagram-container')) {
+                    closeModal();
+                }
+            }
         });
     </script>
 </body>
