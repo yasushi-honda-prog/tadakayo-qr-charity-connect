@@ -220,7 +220,7 @@
                 <img src="assets/tadakayo-logo.jpg" alt="タダカヨ" style="width: 80px; height: 80px; border-radius: 16px; background: white;">
                 <div>
                     <h1>タダカヨ QRチャリティ・コネクト</h1>
-                    <p>QRコードを起点としたスマートフォン支援決済システム</p>
+                    <p>QRスキャン→PayPay決済の最短フローで支援を実現</p>
                 </div>
             </div>
             <span class="badge">GCP Serverless Architecture</span>
@@ -255,7 +255,7 @@
         <section id="overview">
             <div class="container">
                 <h2>プロジェクト概要</h2>
-                <p>本システムは、NPO法人タダカヨの活動を支援するための決済プラットフォームです。チラシ・名刺・イベント投影に印刷されたQRコードをスキャンするだけで、PayPayや楽天ペイを通じてスムーズに支援決済を完了できます。</p>
+                <p>本システムは、NPO法人タダカヨの活動を支援するための決済プラットフォームです。<strong>固定金額のQRコードをスキャンするだけで、PayPay決済ページに直接遷移</strong>。最短2タップで支援が完了します。チラシ・名刺・イベント投影に印刷して、支援への導線を最大化できます。</p>
 
                 <div class="note" style="background: #f0fdf4; border-left-color: #10b981;">
                     <strong>重要：対価性のある取引（売上）</strong><br>
@@ -264,19 +264,19 @@
 
                 <div class="grid">
                     <div class="feature-card">
-                        <h4>簡単な支援体験</h4>
-                        <p>QRコードをスキャンするだけで支援画面へ。アプリのインストール不要。</p>
+                        <h4>📱 QRコード→即決済</h4>
+                        <p>金額付きQRコードをスキャン→PayPayで即決済。最短2タップで支援完了。</p>
                     </div>
                     <div class="feature-card">
-                        <h4>複数の決済手段</h4>
-                        <p>PayPay、楽天ペイに対応。ユーザーの好みの決済方法を選択可能。</p>
+                        <h4>🎯 固定金額QRコード</h4>
+                        <p>500円/1,000円/3,000円/5,000円のQRコードを発行。チラシ・名刺に最適。</p>
                     </div>
                     <div class="feature-card">
-                        <h4>流入元トラッキング</h4>
+                        <h4>📊 流入元トラッキング</h4>
                         <p>チラシ・名刺・イベントごとの効果測定で、マーケティング改善に活用。</p>
                     </div>
                     <div class="feature-card">
-                        <h4>低コスト運用</h4>
+                        <h4>💰 低コスト運用</h4>
                         <p>GCPサーバーレス構成による従量課金。アクセスがない時は課金ゼロ。</p>
                     </div>
                 </div>
@@ -650,9 +650,8 @@ gitGraph
 
                 <div class="note" style="background: #f0fdf4; border-left-color: #10b981; margin-bottom: 24px;">
                     <strong>🎉 デモ版公開中！</strong><br>
-                    第3段階・第4段階のモック版が完了し、デモ版として公開しています。<br>
-                    <strong>PayPay SDK Sandbox接続確認済み</strong>（2025/01/24）<br>
-                    <strong>固定金額QRコード機能追加</strong>（2025/01/25）<br>
+                    PayPay SDK Sandbox接続確認済み。QRコード決済の完全なフローをテストできます。<br>
+                    <strong>最新更新</strong>（2026/01/25）: UIをQRコード決済中心に刷新<br>
                     <div style="margin-top: 12px;">
                         <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: #10b981; font-weight: 600; margin-right: 16px;">支援ページ →</a>
                         <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/qr/500" target="_blank" style="color: #10b981; font-weight: 600;">500円QRコード →</a>
