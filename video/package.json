@@ -1,0 +1,22 @@
+{
+  "name": "tadakayo-short-video",
+  "version": "1.0.0",
+  "description": "Remotion short video for Tadakayo QR Charity Connect",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render TadakayoShort out/tadakayo-short.mp4 --crf 23",
+    "preview": "remotion preview"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.0",
+    "@remotion/transitions": "^4.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "typescript": "^5.0.0"
+  }
+}

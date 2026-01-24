@@ -359,6 +359,35 @@
             font-weight: 600;
         }
 
+        /* ===== HERO VIDEO ===== */
+        .hero-with-video {
+            display: flex;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .hero-video {
+            flex-shrink: 0;
+            width: 200px;
+        }
+
+        .hero-video video {
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid var(--brand);
+            box-shadow: var(--shadow-glow);
+        }
+
+        @media (min-width: 1024px) {
+            .hero-video {
+                width: 280px;
+            }
+        }
+
         /* ===== SECTION STYLES ===== */
         section {
             padding: 48px 0;
@@ -899,6 +928,15 @@
             .header-cta .btn-demo {
                 display: none;
             }
+
+            .hero-with-video {
+                flex-direction: column;
+            }
+
+            .hero-video {
+                width: 160px;
+                margin-top: 24px;
+            }
         }
 
         /* ===== MOBILE NAV TOGGLE ===== */
@@ -1031,16 +1069,23 @@
     <main class="main-content">
         <!-- HERO -->
         <div class="hero">
-            <div class="hero-content">
-                <div class="hero-eyebrow">
-                    <span>●</span> Sandbox環境稼働中
+            <div class="hero-content hero-with-video">
+                <div class="hero-text">
+                    <div class="hero-eyebrow">
+                        <span>●</span> Sandbox環境稼働中
+                    </div>
+                    <h1>タダカヨ<br>QRチャリティ・コネクト</h1>
+                    <p>
+                        NPO法人タダカヨの活動を支援するための決済プラットフォーム。
+                        <span class="hero-highlight">QRコードをスキャンするだけで、PayPay決済ページに直接遷移</span>。
+                        最短2タップで支援が完了します。
+                    </p>
                 </div>
-                <h1>タダカヨ<br>QRチャリティ・コネクト</h1>
-                <p>
-                    NPO法人タダカヨの活動を支援するための決済プラットフォーム。
-                    <span class="hero-highlight">QRコードをスキャンするだけで、PayPay決済ページに直接遷移</span>。
-                    最短2タップで支援が完了します。
-                </p>
+                <div class="hero-video">
+                    <video autoplay loop muted playsinline>
+                        <source src="assets/video/tadakayo-short.mp4" type="video/mp4">
+                    </video>
+                </div>
             </div>
         </div>
 
