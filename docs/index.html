@@ -1897,10 +1897,10 @@ mindmap
                     // Calculate zoom to fit with some padding
                     const zoomX = bodyWidth / svgWidth;
                     const zoomY = bodyHeight / svgHeight;
-                    currentZoom = Math.min(zoomX, zoomY, 2.5); // Cap at 250%
-                    currentZoom = Math.max(currentZoom, 1); // Minimum 100%
+                    currentZoom = Math.min(zoomX, zoomY, 5); // Cap at 500%
+                    currentZoom = Math.max(currentZoom, 1.5); // Minimum 150%
                 } else {
-                    currentZoom = 1.5;
+                    currentZoom = 2;
                 }
 
                 panX = 0;
@@ -1916,12 +1916,12 @@ mindmap
         }
 
         function zoomIn() {
-            currentZoom = Math.min(currentZoom + 0.25, 4);
+            currentZoom = Math.min(currentZoom * 1.25, 10);
             updateDiagramTransform();
         }
 
         function zoomOut() {
-            currentZoom = Math.max(currentZoom - 0.25, 0.25);
+            currentZoom = Math.max(currentZoom / 1.25, 0.25);
             updateDiagramTransform();
         }
 
@@ -1942,9 +1942,9 @@ mindmap
         document.getElementById('modalBody').addEventListener('wheel', (e) => {
             e.preventDefault();
             if (e.deltaY < 0) {
-                currentZoom = Math.min(currentZoom + 0.1, 4);
+                currentZoom = Math.min(currentZoom * 1.1, 10);
             } else {
-                currentZoom = Math.max(currentZoom - 0.1, 0.25);
+                currentZoom = Math.max(currentZoom / 1.1, 0.25);
             }
             updateDiagramTransform();
         });
@@ -1989,7 +1989,7 @@ mindmap
             } else if (e.touches.length === 2) {
                 const distance = getTouchDistance(e.touches);
                 const delta = distance - lastTouchDistance;
-                currentZoom = Math.min(Math.max(currentZoom + delta * 0.005, 0.25), 4);
+                currentZoom = Math.min(Math.max(currentZoom + delta * 0.01, 0.25), 10);
                 lastTouchDistance = distance;
                 updateDiagramTransform();
             }
