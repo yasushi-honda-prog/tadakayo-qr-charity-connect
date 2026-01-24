@@ -29,3 +29,22 @@ variable "image" {
   type        = string
   default     = ""
 }
+
+# Secret Manager secret IDs
+variable "paypay_api_key_secret_id" {
+  description = "PayPay API Key secret ID"
+  type        = string
+  default     = ""
+}
+
+variable "paypay_api_secret_secret_id" {
+  description = "PayPay API Secret secret ID"
+  type        = string
+  default     = ""
+}
+
+variable "paypay_merchant_id_secret_id" {
+  description = "PayPay Merchant ID secret ID"
+  type        = string
+  default     = ""
+}

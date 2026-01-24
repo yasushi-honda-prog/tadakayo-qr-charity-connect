@@ -41,6 +41,46 @@ resource "google_cloud_run_v2_service" "api" {
         value = var.region
       }
 
+      # PayPay credentials from Secret Manager
+      dynamic "env" {
+        for_each = var.paypay_api_key_secret_id != "" ? [1] : []
+        content {
+          name = "PAYPAY_API_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = var.paypay_api_key_secret_id
+              version = "latest"
+            }
+          }
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.paypay_api_secret_secret_id != "" ? [1] : []
+        content {
+          name = "PAYPAY_API_SECRET"
+          value_source {
+            secret_key_ref {
+              secret  = var.paypay_api_secret_secret_id
+              version = "latest"
+            }
+          }
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.paypay_merchant_id_secret_id != "" ? [1] : []
+        content {
+          name = "PAYPAY_MERCHANT_ID"
+          value_source {
+            secret_key_ref {
+              secret  = var.paypay_merchant_id_secret_id
+              version = "latest"
+            }
+          }
+        }
+      }
+
       resources {
         limits = {
           cpu    = "1"
