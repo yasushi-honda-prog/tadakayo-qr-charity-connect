@@ -313,7 +313,7 @@
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
     <header>
@@ -528,20 +528,18 @@
             const qrContainer = document.getElementById('qrCode');
             const currentUrl = window.location.href.split('?')[0]; // クエリパラメータを除去
 
-            QRCode.toCanvas(document.createElement('canvas'), currentUrl, {
-                width: 160,
-                margin: 0,
-                color: {
-                    dark: '#1a1a1a',
-                    light: '#ffffff'
-                }
-            }, function(error, canvas) {
-                if (error) {
-                    console.error('QRコード生成エラー:', error);
-                    return;
-                }
-                qrContainer.appendChild(canvas);
-            });
+            try {
+                new QRCode(qrContainer, {
+                    text: currentUrl,
+                    width: 160,
+                    height: 160,
+                    colorDark: '#1a1a1a',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.L
+                });
+            } catch (error) {
+                console.error('QRコード生成エラー:', error);
+            }
         });
     </script>
 </body>
