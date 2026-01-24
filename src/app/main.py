@@ -122,6 +122,24 @@ async def cancel_page() -> FileResponse:
     return FileResponse(STATIC_DIR / "cancel.html")
 
 
+@app.get("/qr/{amount}", response_model=None)
+async def qr_payment_page(amount: int):
+    """Serve the QR payment page for a fixed amount.
+
+    The page will create a PayPay checkout session and display
+    the payment URL as a QR code.
+
+    Args:
+        amount: The donation amount in JPY (100-1,000,000)
+    """
+    if amount < 100 or amount > 1000000:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "INVALID_AMOUNT", "message": "金額は100円〜1,000,000円の範囲で指定してください"}
+        )
+    return FileResponse(STATIC_DIR / "qr-payment.html")
+
+
 @app.get("/health")
 async def health_check() -> dict[str, str]:
     """Health check endpoint for Cloud Run."""
