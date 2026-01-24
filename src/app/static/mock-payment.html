@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>モック決済 | タダカヨ</title>
+    <style>
+        :root {
+            --primary: #E52D27;
+            --primary-dark: #c41e1a;
+            --secondary: #1a1a1a;
+            --bg: #fff5f5;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e8e8e8;
+            --error: #d32f2f;
+            --success: #2e7d32;
+            --paypay: #ff0033;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: linear-gradient(135deg, var(--paypay) 0%, #cc0029 100%);
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .header-text h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .header-text p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        .mock-badge {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 8px;
+            border: 1px solid #ffc107;
+        }
+        main {
+            flex: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 32px 16px;
+            width: 100%;
+        }
+        .mock-notice {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .mock-notice-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #1565c0;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .mock-notice-text {
+            font-size: 0.85rem;
+            color: #1565c0;
+            line-height: 1.6;
+        }
+        .payment-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 32px 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .payment-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        .payment-title {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        .payment-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 24px;
+        }
+        .payment-amount .currency {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--text-light);
+        }
+        .payment-description {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-pay {
+            background: var(--paypay);
+            color: white;
+        }
+        .btn-pay:hover {
+            background: #cc0029;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 0, 51, 0.3);
+        }
+        .btn-cancel {
+            background: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--border);
+        }
+        .btn-cancel:hover {
+            background: #f5f5f5;
+            border-color: var(--text-light);
+        }
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px;
+        }
+        .loading.show {
+            display: flex;
+        }
+        .loading.show + .btn-group {
+            display: none;
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--paypay);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 16px;
+            font-size: 1rem;
+            color: var(--text);
+        }
+        footer {
+            text-align: center;
+            padding: 24px 16px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-text">
+                <h1>PayPay</h1>
+                <p>モック決済シミュレーション</p>
+                <span class="mock-badge">テスト環境</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="mock-notice">
+            <div class="mock-notice-title">
+                🧪 シミュレーションモード
+            </div>
+            <div class="mock-notice-text">
+                これはモック決済画面です。<br>
+                実際の決済は発生しません。
+            </div>
+        </div>
+
+        <div class="payment-card">
+            <div class="payment-icon">💳</div>
+            <div class="payment-title">お支払い金額</div>
+            <div class="payment-amount">
+                <span id="amount">--</span><span class="currency">円</span>
+            </div>
+            <div class="payment-description">
+                タダカヨへの支援金
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="loading-text">処理中...</p>
+            </div>
+
+            <div class="btn-group" id="btnGroup">
+                <button class="btn btn-pay" id="payBtn">支払う</button>
+                <button class="btn btn-cancel" id="cancelBtn">キャンセル</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p><a href="https://mmky310.info/" target="_blank">NPO法人タダカヨ</a></p>
+    </footer>
+
+    <script>
+        // URLパラメータを取得
+        const params = new URLSearchParams(window.location.search);
+        const amount = params.get('amount') || '0';
+        const returnUrl = params.get('return_url') || '/thanks';
+        const cancelUrl = params.get('cancel_url') || '/cancel';
+
+        // 金額を表示（カンマ区切り）
+        const amountNum = parseInt(amount, 10);
+        document.getElementById('amount').textContent = amountNum.toLocaleString('ja-JP');
+
+        // DOM要素
+        const payBtn = document.getElementById('payBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const loading = document.getElementById('loading');
+
+        // 支払うボタン
+        payBtn.addEventListener('click', () => {
+            loading.classList.add('show');
+            // 少し遅延させてローディング表示を見せる
+            setTimeout(() => {
+                window.location.href = decodeURIComponent(returnUrl);
+            }, 800);
+        });
+
+        // キャンセルボタン
+        cancelBtn.addEventListener('click', () => {
+            window.location.href = decodeURIComponent(cancelUrl);
+        });
+    </script>
+</body>
+</html>

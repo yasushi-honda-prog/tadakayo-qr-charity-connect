@@ -58,7 +58,8 @@ class TestPaymentService:
         assert response.donation_id.startswith("don_")
         assert response.provider == PaymentProvider.PAYPAY
         assert response.status == DonationStatus.PENDING
-        assert "sandbox.paypay" in response.redirect_url
+        # Mock mode uses our own mock payment endpoint
+        assert "/mock/payment/" in response.redirect_url
 
         # Verify donation was saved
         donation = await repository.get_by_id(response.donation_id)

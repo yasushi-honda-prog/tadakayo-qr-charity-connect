@@ -11,6 +11,7 @@ import json
 import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
+from urllib.parse import quote
 
 import paypayopa
 import structlog
@@ -69,15 +70,17 @@ class PayPayAdapter(PaymentProviderAdapter):
 
     def _create_mock_session(self, input: CheckoutSessionInput) -> CheckoutSessionResult:
         """Create a mock checkout session for testing without API credentials."""
+        from app.config import settings
+
         provider_order_id = f"paypay_{uuid.uuid4().hex[:12]}"
         expires_at = datetime.now(UTC) + timedelta(hours=1)
 
-        # Mock sandbox URL
-        base_url = "https://sandbox.paypay.ne.jp"
+        # Use our own mock payment page instead of non-existent sandbox URL
         redirect_url = (
-            f"{base_url}/checkout/{provider_order_id}"
+            f"{settings.base_url}/mock/payment/{provider_order_id}"
             f"?amount={input.amount}"
-            f"&return_url={input.return_url}"
+            f"&return_url={quote(input.return_url)}"
+            f"&cancel_url={quote(input.cancel_url)}"
         )
 
         logger.info(

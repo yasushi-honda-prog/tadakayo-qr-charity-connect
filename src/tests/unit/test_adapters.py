@@ -31,9 +31,14 @@ class TestPayPayAdapter:
         )
         result = await adapter.create_checkout_session(input)
 
-        assert result.redirect_url.startswith("https://sandbox.paypay.ne.jp")
+        # Mock mode should use our own mock payment endpoint
+        assert "/mock/payment/" in result.redirect_url
         assert result.provider_order_id.startswith("paypay_")
         assert result.expires_at is not None
+        # Verify URL parameters are included and properly encoded
+        assert "amount=1000" in result.redirect_url
+        assert "return_url=" in result.redirect_url
+        assert "cancel_url=" in result.redirect_url
 
     @pytest.mark.asyncio
     async def test_verify_webhook_valid(self, adapter):
