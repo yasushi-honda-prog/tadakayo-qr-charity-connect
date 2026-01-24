@@ -1571,18 +1571,26 @@ gitGraph
                 </div>
 
                 <h3>テストに必要なもの</h3>
+                <div class="alert alert-info" style="margin-bottom: 20px;">
+                    <span class="alert-icon">🔒</span>
+                    <div class="alert-content">
+                        <h4>開発者専用環境</h4>
+                        <p>以下のツールは<strong>PayPay for Developers加盟店の開発者ダッシュボード</strong>からのみ入手可能です（一般公開されていません）。</p>
+                    </div>
+                </div>
                 <div class="card-grid">
                     <div class="feature-card">
                         <h4>1️⃣ PayPay Sandboxアプリ</h4>
                         <p>通常のPayPayアプリとは別の、開発者向け専用テストアプリです。</p>
                         <ul style="margin-top: 12px; padding-left: 20px; font-size: 0.9rem;">
-                            <li>iOS: TestFlight経由でインストール</li>
+                            <li>開発者ダッシュボードからリンク取得</li>
+                            <li>iOS: TestFlight経由</li>
                             <li>Android: APKダウンロード</li>
                         </ul>
                     </div>
                     <div class="feature-card">
                         <h4>2️⃣ テストユーザーアカウント</h4>
-                        <p>PayPay開発者ダッシュボードで発行されるテスト用アカウントです。</p>
+                        <p>開発者ダッシュボードで発行されるテスト用アカウントです。</p>
                         <ul style="margin-top: 12px; padding-left: 20px; font-size: 0.9rem;">
                             <li>仮想残高（¥100,000）が設定済み</li>
                             <li>実際の決済は発生しません</li>
@@ -1590,10 +1598,11 @@ gitGraph
                     </div>
                 </div>
 
-                <h3>テスト手順</h3>
+                <h3>テスト手順（加盟店開発者向け）</h3>
                 <div class="card">
                     <ol>
-                        <li><strong>PayPay Sandboxアプリ</strong>をインストール（PayPay開発者ダッシュボードからダウンロード）</li>
+                        <li>PayPay for Developersの<strong>開発者ダッシュボード</strong>にログイン</li>
+                        <li><strong>PayPay Sandboxアプリ</strong>のダウンロードリンクを取得してインストール</li>
                         <li>Sandboxアプリで<strong>テストユーザーアカウント</strong>にログイン</li>
                         <li><a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: var(--accent-blue);">デモ版支援ページ</a>で金額を選択しQRコードを表示</li>
                         <li>Sandboxアプリで<strong>QRコードをスキャン</strong></li>
