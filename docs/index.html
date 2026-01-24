@@ -1872,6 +1872,7 @@ mindmap
         function openDiagramModal(mermaidEl) {
             const modal = document.getElementById('diagramModal');
             const container = document.getElementById('diagramContainer');
+            const modalBody = document.getElementById('modalBody');
 
             // Clone the SVG content
             const svg = mermaidEl.querySelector('svg');
@@ -1881,14 +1882,31 @@ mindmap
                 container.innerHTML = mermaidEl.innerHTML;
             }
 
-            // Reset view
-            currentZoom = 1;
-            panX = 0;
-            panY = 0;
-            updateDiagramTransform();
-
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
+
+            // Calculate optimal zoom to fit the diagram
+            requestAnimationFrame(() => {
+                const clonedSvg = container.querySelector('svg');
+                if (clonedSvg) {
+                    const svgWidth = clonedSvg.getBoundingClientRect().width || clonedSvg.viewBox?.baseVal?.width || 800;
+                    const svgHeight = clonedSvg.getBoundingClientRect().height || clonedSvg.viewBox?.baseVal?.height || 600;
+                    const bodyWidth = modalBody.clientWidth - 96;
+                    const bodyHeight = modalBody.clientHeight - 96;
+
+                    // Calculate zoom to fit with some padding
+                    const zoomX = bodyWidth / svgWidth;
+                    const zoomY = bodyHeight / svgHeight;
+                    currentZoom = Math.min(zoomX, zoomY, 2.5); // Cap at 250%
+                    currentZoom = Math.max(currentZoom, 1); // Minimum 100%
+                } else {
+                    currentZoom = 1.5;
+                }
+
+                panX = 0;
+                panY = 0;
+                updateDiagramTransform();
+            });
         }
 
         function closeModal() {
