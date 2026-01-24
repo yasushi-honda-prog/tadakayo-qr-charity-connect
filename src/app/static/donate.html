@@ -277,6 +277,35 @@
             color: var(--primary);
             text-decoration: none;
         }
+        .qr-section {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        #qrCode {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        #qrCode img {
+            display: block;
+        }
+        .qr-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-align: center;
+            line-height: 1.6;
+        }
         @media (max-width: 360px) {
             .amount-btn {
                 padding: 16px 12px;
@@ -284,6 +313,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body>
     <header>
@@ -344,6 +374,14 @@
             </button>
         </section>
     </main>
+
+    <section class="qr-section">
+        <h2 class="section-title">このページを共有</h2>
+        <div class="qr-container">
+            <div id="qrCode"></div>
+            <p class="qr-text">QRコードをスキャンして<br>この支援ページを共有できます</p>
+        </div>
+    </section>
 
     <footer>
         <p><a href="https://mmky310.info/" target="_blank">NPO法人タダカヨ</a></p>
@@ -484,6 +522,27 @@
             loadingOverlay.classList.remove('show');
             providerBtns.forEach(btn => btn.disabled = false);
         }
+
+        // QRコード生成
+        document.addEventListener('DOMContentLoaded', function() {
+            const qrContainer = document.getElementById('qrCode');
+            const currentUrl = window.location.href.split('?')[0]; // クエリパラメータを除去
+
+            QRCode.toCanvas(document.createElement('canvas'), currentUrl, {
+                width: 160,
+                margin: 0,
+                color: {
+                    dark: '#1a1a1a',
+                    light: '#ffffff'
+                }
+            }, function(error, canvas) {
+                if (error) {
+                    console.error('QRコード生成エラー:', error);
+                    return;
+                }
+                qrContainer.appendChild(canvas);
+            });
+        });
     </script>
 </body>
 </html>
