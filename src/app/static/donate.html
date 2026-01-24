@@ -306,6 +306,29 @@
             text-align: center;
             line-height: 1.6;
         }
+        .qr-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .qr-link-btn {
+            display: block;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .qr-link-btn:hover {
+            border-color: #ff0033;
+            background: #fff0f0;
+            color: #ff0033;
+        }
         @media (max-width: 360px) {
             .amount-btn {
                 padding: 16px 12px;
@@ -313,7 +336,7 @@
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
 </head>
 <body>
     <header>
@@ -376,11 +399,19 @@
     </main>
 
     <section class="qr-section">
-        <h2 class="section-title">このページを共有</h2>
-        <div class="qr-container">
-            <div id="qrCode"></div>
-            <p class="qr-text">QRコードをスキャンして<br>この支援ページを共有できます</p>
-        </div>
+        <main style="max-width: 480px; margin: 0 auto; padding: 0 16px 24px;">
+            <h2 class="section-title">固定金額QRコードを発行</h2>
+            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 16px; line-height: 1.6;">
+                チラシ・名刺用のPayPay決済QRコードを発行できます。<br>
+                QRスキャン→PayPay決済の流れでスムーズに支援できます。
+            </p>
+            <div class="qr-links">
+                <a href="/qr/500" class="qr-link-btn">500円のQRコード</a>
+                <a href="/qr/1000" class="qr-link-btn">1,000円のQRコード</a>
+                <a href="/qr/3000" class="qr-link-btn">3,000円のQRコード</a>
+                <a href="/qr/5000" class="qr-link-btn">5,000円のQRコード</a>
+            </div>
+        </main>
     </section>
 
     <footer>
@@ -523,24 +554,6 @@
             providerBtns.forEach(btn => btn.disabled = false);
         }
 
-        // QRコード生成
-        document.addEventListener('DOMContentLoaded', function() {
-            const qrContainer = document.getElementById('qrCode');
-            const currentUrl = window.location.href.split('?')[0]; // クエリパラメータを除去
-
-            try {
-                new QRCode(qrContainer, {
-                    text: currentUrl,
-                    width: 160,
-                    height: 160,
-                    colorDark: '#1a1a1a',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.L
-                });
-            } catch (error) {
-                console.error('QRコード生成エラー:', error);
-            }
-        });
     </script>
 </body>
 </html>

@@ -8,6 +8,7 @@ import structlog
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import Response
 
 from app.adapters.paypay import PayPayAdapter
 from app.adapters.rakuten import RakutenPayAdapter
@@ -120,6 +121,27 @@ async def thanks_page() -> FileResponse:
 async def cancel_page() -> FileResponse:
     """Serve the cancellation page."""
     return FileResponse(STATIC_DIR / "cancel.html")
+
+
+@app.get("/qr/{amount}", response_model=None)
+async def qr_payment_page(amount: int) -> Response:
+    """Serve the QR payment page for a fixed amount.
+
+    The page will create a PayPay checkout session and display
+    the payment URL as a QR code.
+
+    Args:
+        amount: The donation amount in JPY (100-1,000,000)
+    """
+    if amount < 100 or amount > 1000000:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "INVALID_AMOUNT",
+                "message": "金額は100円〜1,000,000円の範囲で指定してください",
+            },
+        )
+    return FileResponse(STATIC_DIR / "qr-payment.html")
 
 
 @app.get("/health")
