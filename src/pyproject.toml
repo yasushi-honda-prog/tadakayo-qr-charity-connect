@@ -13,6 +13,7 @@ dependencies = [
     "httpx>=0.28",
     "structlog>=24.4",
     "paypayopa>=1.0",
+    "setuptools>=80",  # Required by paypayopa (pkg_resources)
 ]
 
 [project.optional-dependencies]
