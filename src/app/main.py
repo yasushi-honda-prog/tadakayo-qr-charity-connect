@@ -1,19 +1,19 @@
 """FastAPI application entry point."""
 
-import os
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import AsyncGenerator
 
 import structlog
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.config import settings
 from app.adapters.paypay import PayPayAdapter
 from app.adapters.rakuten import RakutenPayAdapter
-from app.api.donations import router as donations_router, set_payment_service
+from app.api.donations import router as donations_router
+from app.api.donations import set_payment_service
+from app.config import settings
 from app.models.donation import PaymentProvider
 from app.repositories.donation import FirestoreDonationRepository, InMemoryDonationRepository
 from app.services.payment import PaymentService

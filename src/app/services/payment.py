@@ -1,7 +1,7 @@
 """Payment service for handling checkout and webhook processing."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 
@@ -114,10 +114,10 @@ class PaymentService:
                 provider=request.provider.value,
                 error=str(e),
             )
-            raise PaymentServiceError("PROVIDER_UNAVAILABLE", str(e))
+            raise PaymentServiceError("PROVIDER_UNAVAILABLE", str(e)) from e
 
         # Create donation record
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         donation = Donation(
             id=donation_id,
             amount=request.amount,
@@ -222,7 +222,7 @@ class PaymentService:
             provider_event_id=normalized.provider_event_id,
             provider_order_id=normalized.provider_order_id,
             status=normalized.status,
-            received_at=datetime.now(timezone.utc),
+            received_at=datetime.now(UTC),
             raw_payload=normalized.raw_payload,
             signature_valid=True,
         )
@@ -235,7 +235,7 @@ class PaymentService:
 
         if donation:
             completed_at = (
-                datetime.now(timezone.utc)
+                datetime.now(UTC)
                 if normalized.status == DonationStatus.COMPLETED
                 else None
             )

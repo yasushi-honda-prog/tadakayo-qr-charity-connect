@@ -1,7 +1,8 @@
 """Unit tests for data models."""
 
+from datetime import UTC, datetime
+
 import pytest
-from datetime import datetime, timezone
 from pydantic import ValidationError
 
 from app.models.donation import (
@@ -61,7 +62,7 @@ class TestDonation:
 
     def test_valid_donation(self):
         """Test creating a valid donation."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         donation = Donation(
             id="don_123",
             amount=1000,
@@ -80,7 +81,7 @@ class TestDonation:
     def test_status_transitions(self):
         """Test valid status values."""
         for status in DonationStatus:
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             donation = Donation(
                 id="don_123",
                 amount=1000,

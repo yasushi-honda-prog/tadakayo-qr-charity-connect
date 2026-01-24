@@ -8,7 +8,7 @@ import hashlib
 import hmac
 import json
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import structlog
 
@@ -17,7 +17,6 @@ from app.adapters.base import (
     CheckoutSessionResult,
     NormalizedEvent,
     PaymentProviderAdapter,
-    ProviderError,
     WebhookVerificationResult,
 )
 from app.models.donation import DonationStatus, PaymentProvider
@@ -67,7 +66,7 @@ class RakutenPayAdapter(PaymentProviderAdapter):
 
         # Mock implementation - generate fake redirect URL
         provider_order_id = f"rakuten_{uuid.uuid4().hex[:12]}"
-        expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+        expires_at = datetime.now(UTC) + timedelta(hours=1)
 
         # In production, this would be the actual Rakuten Pay payment URL
         redirect_url = (

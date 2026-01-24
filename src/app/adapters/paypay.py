@@ -4,11 +4,12 @@ Uses the official PayPay OPA SDK for API integration.
 https://github.com/paypay/paypayopa-sdk-python
 """
 
+import contextlib
 import hashlib
 import hmac
 import json
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import paypayopa
 import structlog
@@ -68,7 +69,7 @@ class PayPayAdapter(PaymentProviderAdapter):
     def _create_mock_session(self, input: CheckoutSessionInput) -> CheckoutSessionResult:
         """Create a mock checkout session for testing without API credentials."""
         provider_order_id = f"paypay_{uuid.uuid4().hex[:12]}"
-        expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+        expires_at = datetime.now(UTC) + timedelta(hours=1)
 
         # Mock sandbox URL
         base_url = "https://sandbox.paypay.ne.jp"
@@ -155,15 +156,11 @@ class PayPayAdapter(PaymentProviderAdapter):
                 )
 
             # Parse expiry date
-            expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+            expires_at = datetime.now(UTC) + timedelta(hours=1)
             if expiry_date:
-                try:
+                with contextlib.suppress(ValueError, TypeError):
                     # PayPay returns Unix timestamp in milliseconds
-                    expires_at = datetime.fromtimestamp(
-                        expiry_date / 1000, tz=timezone.utc
-                    )
-                except (ValueError, TypeError):
-                    pass
+                    expires_at = datetime.fromtimestamp(expiry_date / 1000, tz=UTC)
 
             logger.info(
                 "PayPay checkout session created",
