@@ -69,7 +69,7 @@ const ProblemScene: React.FC = () => {
       >
         <h1
           style={{
-            fontSize: 72,
+            fontSize: 96,
             fontWeight: 700,
             color: theme.textPrimary,
             textAlign: "center",
@@ -83,12 +83,12 @@ const ProblemScene: React.FC = () => {
         style={{
           opacity: Math.max(0, text2Spring),
           transform: `translateY(${(1 - Math.max(0, text2Spring)) * 30}px)`,
-          marginTop: 24,
+          marginTop: 32,
         }}
       >
         <h2
           style={{
-            fontSize: 64,
+            fontSize: 88,
             fontWeight: 700,
             color: theme.brand,
             textAlign: "center",
@@ -200,7 +200,7 @@ const SolutionScene: React.FC = () => {
       >
         <h1
           style={{
-            fontSize: 80,
+            fontSize: 100,
             fontWeight: 700,
             color: theme.textPrimary,
             margin: 0,
@@ -209,7 +209,7 @@ const SolutionScene: React.FC = () => {
         >
           QRコードを
           <br />
-          <span style={{ color: theme.brand, fontSize: 96 }}>スキャン</span>
+          <span style={{ color: theme.brand, fontSize: 120 }}>スキャン</span>
           <br />
           するだけ！
         </h1>
@@ -291,7 +291,7 @@ const CTAScene: React.FC = () => {
       >
         <h1
           style={{
-            fontSize: 72,
+            fontSize: 100,
             fontWeight: 700,
             color: theme.textPrimary,
             margin: 0,
@@ -299,16 +299,16 @@ const CTAScene: React.FC = () => {
           }}
         >
           最短
-          <span style={{ color: theme.brand, fontSize: 120 }}>2</span>
+          <span style={{ color: theme.brand, fontSize: 160 }}>2</span>
           タップで
         </h1>
         <h2
           style={{
-            fontSize: 96,
+            fontSize: 120,
             fontWeight: 700,
             color: theme.brand,
             margin: 0,
-            marginTop: 16,
+            marginTop: 20,
           }}
         >
           支援完了！
@@ -318,8 +318,8 @@ const CTAScene: React.FC = () => {
         <div
           style={{
             display: "flex",
-            gap: 20,
-            marginTop: 40,
+            gap: 32,
+            marginTop: 48,
             transform: `scale(${Math.max(0, badgeSpring)})`,
           }}
         >
@@ -327,9 +327,9 @@ const CTAScene: React.FC = () => {
             style={{
               backgroundColor: "#FF0033",
               color: "white",
-              padding: "16px 32px",
-              borderRadius: 12,
-              fontSize: 32,
+              padding: "24px 48px",
+              borderRadius: 16,
+              fontSize: 48,
               fontWeight: 700,
             }}
           >
@@ -339,9 +339,9 @@ const CTAScene: React.FC = () => {
             style={{
               backgroundColor: "#BF0000",
               color: "white",
-              padding: "16px 32px",
-              borderRadius: 12,
-              fontSize: 32,
+              padding: "24px 48px",
+              borderRadius: 16,
+              fontSize: 48,
               fontWeight: 700,
             }}
           >
