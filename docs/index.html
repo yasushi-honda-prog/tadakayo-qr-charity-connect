@@ -984,15 +984,15 @@
             </div>
             <div class="header-badges">
                 <span class="badge badge-tech">GCP Serverless</span>
-                <span class="badge badge-demo">デモ版公開中</span>
+                <span class="badge badge-demo" title="開発者向けテスト環境（通常のPayPayアプリでは利用不可）">デモ版（開発者向け）</span>
             </div>
             <div class="header-cta">
                 <button class="theme-toggle" onclick="toggleTheme()" title="テーマ切り替え">
                     <span class="icon-moon">🌙</span>
                     <span class="icon-sun">☀️</span>
                 </button>
-                <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" class="btn-demo">
-                    デモを試す →
+                <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" class="btn-demo" title="⚠️ 開発者向け：PayPay Sandboxアプリが必要です">
+                    デモを試す（開発者向け）→
                 </a>
             </div>
         </div>
@@ -1460,15 +1460,16 @@ gitGraph
                     <h2>開発ロードマップ</h2>
                 </div>
 
-                <div class="alert alert-success">
-                    <span class="alert-icon">🎉</span>
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠️</span>
                     <div class="alert-content">
-                        <h4>デモ版公開中！</h4>
-                        <p>PayPay SDK Sandbox接続確認済み。QRコード決済の完全なフローをテストできます。<br>
-                        <strong>最新更新</strong>（2026/01/25）: UIをQRコード決済中心に刷新</p>
+                        <h4>デモ版公開中（開発者向けテスト環境）</h4>
+                        <p>PayPay Sandbox接続済み。<strong>通常のPayPayアプリでは利用できません。</strong><br>
+                        テストにはPayPay Sandboxアプリ＋テストユーザーが必要です（<a href="#demo-test" style="color: var(--accent-yellow);">詳細</a>）。<br>
+                        <span style="font-size: 0.85rem; opacity: 0.8;">最新更新（2026/01/25）: UIをQRコード決済中心に刷新</span></p>
                         <div style="margin-top: 12px; display: flex; gap: 16px;">
-                            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: var(--accent-green); font-weight: 600;">支援ページ →</a>
-                            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/qr/500" target="_blank" style="color: var(--accent-green); font-weight: 600;">500円QRコード →</a>
+                            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: var(--accent-yellow); font-weight: 600;">支援ページ →</a>
+                            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/qr/500" target="_blank" style="color: var(--accent-yellow); font-weight: 600;">500円QRコード →</a>
                         </div>
                     </div>
                 </div>
