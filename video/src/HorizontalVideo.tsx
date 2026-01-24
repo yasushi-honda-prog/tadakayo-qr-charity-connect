@@ -10,11 +10,10 @@ import {
 } from "remotion";
 import { loadFont } from "@remotion/google-fonts/NotoSansJP";
 import { theme } from "./styles/theme";
-import { Typewriter } from "./components/Typewriter";
 
 const { fontFamily } = loadFont();
 
-// Fixed QR-like pattern (7x7 = 49 cells)
+// QR pattern
 const QR_PATTERN = [
   true, true, true, false, true, true, true,
   true, false, true, false, true, false, true,
@@ -25,15 +24,93 @@ const QR_PATTERN = [
   true, true, true, false, true, true, true,
 ];
 
-export const HorizontalVideo: React.FC = () => {
+// Scene 1: Problem (0-120 frames = 4 seconds)
+const ProblemScene: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, durationInFrames } = useVideoConfig();
+  const { fps } = useVideoConfig();
 
-  // Animation phases
-  const logoSpring = spring({
+  const textSpring = spring({
     frame,
     fps,
-    config: { damping: 200, stiffness: 100 },
+    config: { damping: 200, stiffness: 80 },
+  });
+
+  const text2Spring = spring({
+    frame: frame - 30,
+    fps,
+    config: { damping: 200, stiffness: 80 },
+  });
+
+  return (
+    <AbsoluteFill
+      style={{
+        backgroundColor: theme.bgPrimary,
+        fontFamily,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 120,
+          marginBottom: 40,
+          transform: `scale(${textSpring})`,
+        }}
+      >
+        🤔
+      </div>
+      <div
+        style={{
+          opacity: textSpring,
+          transform: `translateY(${(1 - textSpring) * 30}px)`,
+        }}
+      >
+        <h1
+          style={{
+            fontSize: 72,
+            fontWeight: 700,
+            color: theme.textPrimary,
+            textAlign: "center",
+            margin: 0,
+          }}
+        >
+          NPOを支援したい...
+        </h1>
+      </div>
+      <div
+        style={{
+          opacity: Math.max(0, text2Spring),
+          transform: `translateY(${(1 - Math.max(0, text2Spring)) * 30}px)`,
+          marginTop: 24,
+        }}
+      >
+        <h2
+          style={{
+            fontSize: 64,
+            fontWeight: 700,
+            color: theme.brand,
+            textAlign: "center",
+            margin: 0,
+          }}
+        >
+          でも手続きが面倒...
+        </h2>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// Scene 2: Solution (120-240 frames = 4 seconds)
+const SolutionScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const qrSpring = spring({
+    frame,
+    fps,
+    config: { damping: 8, stiffness: 100 },
   });
 
   const textSpring = spring({
@@ -42,27 +119,128 @@ export const HorizontalVideo: React.FC = () => {
     config: { damping: 200, stiffness: 80 },
   });
 
-  const qrSpring = spring({
+  const glowOpacity = interpolate(
+    frame % 40,
+    [0, 20, 40],
+    [0.4, 0.8, 0.4],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
+  return (
+    <AbsoluteFill
+      style={{
+        backgroundColor: theme.bgPrimary,
+        fontFamily,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 100,
+        padding: "0 100px",
+      }}
+    >
+      {/* QR Code */}
+      <div
+        style={{
+          transform: `scale(${qrSpring})`,
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: -40,
+            borderRadius: 40,
+            background: theme.brand,
+            opacity: glowOpacity,
+            filter: "blur(40px)",
+          }}
+        />
+        <div
+          style={{
+            width: 350,
+            height: 350,
+            backgroundColor: "white",
+            borderRadius: 24,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            border: `6px solid ${theme.brand}`,
+          }}
+        >
+          <div
+            style={{
+              width: 260,
+              height: 260,
+              display: "grid",
+              gridTemplateColumns: "repeat(7, 1fr)",
+              gridTemplateRows: "repeat(7, 1fr)",
+              gap: 6,
+            }}
+          >
+            {QR_PATTERN.map((filled, i) => (
+              <div
+                key={i}
+                style={{
+                  backgroundColor: filled ? theme.bgPrimary : "transparent",
+                  borderRadius: 4,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Text */}
+      <div
+        style={{
+          opacity: textSpring,
+          transform: `translateX(${(1 - textSpring) * 50}px)`,
+        }}
+      >
+        <h1
+          style={{
+            fontSize: 80,
+            fontWeight: 700,
+            color: theme.textPrimary,
+            margin: 0,
+            lineHeight: 1.3,
+          }}
+        >
+          QRコードを
+          <br />
+          <span style={{ color: theme.brand, fontSize: 96 }}>スキャン</span>
+          <br />
+          するだけ！
+        </h1>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// Scene 3: CTA (240-360 frames = 4 seconds)
+const CTAScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps, durationInFrames } = useVideoConfig();
+
+  const logoSpring = spring({
+    frame,
+    fps,
+    config: { damping: 200, stiffness: 100 },
+  });
+
+  const textSpring = spring({
+    frame: frame - 15,
+    fps,
+    config: { damping: 200, stiffness: 80 },
+  });
+
+  const badgeSpring = spring({
     frame: frame - 40,
     fps,
     config: { damping: 8, stiffness: 100 },
   });
 
-  const badgeSpring = spring({
-    frame: frame - 60,
-    fps,
-    config: { damping: 8, stiffness: 100 },
-  });
-
-  // Glow pulse
-  const glowOpacity = interpolate(
-    frame % 60,
-    [0, 30, 60],
-    [0.3, 0.6, 0.3],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
-
-  // Fade out at end
   const fadeOut = interpolate(
     frame,
     [durationInFrames - 30, durationInFrames],
@@ -75,193 +253,123 @@ export const HorizontalVideo: React.FC = () => {
       style={{
         backgroundColor: theme.bgPrimary,
         fontFamily,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 80,
+        padding: "0 100px",
         opacity: fadeOut,
       }}
     >
-      {/* Main horizontal layout */}
+      {/* Logo */}
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100%",
-          padding: "60px 80px",
-          gap: 80,
+          transform: `scale(${logoSpring})`,
         }}
       >
-        {/* Left: Logo and text */}
+        <img
+          src={staticFile("tadakayo-logo.jpg")}
+          alt="Tadakayo"
+          style={{
+            width: 280,
+            height: "auto",
+            borderRadius: 24,
+            boxShadow: theme.shadowGlow,
+          }}
+        />
+      </div>
+
+      {/* Text */}
+      <div
+        style={{
+          opacity: textSpring,
+          transform: `translateX(${(1 - textSpring) * 50}px)`,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: 72,
+            fontWeight: 700,
+            color: theme.textPrimary,
+            margin: 0,
+            lineHeight: 1.2,
+          }}
+        >
+          最短
+          <span style={{ color: theme.brand, fontSize: 120 }}>2</span>
+          タップで
+        </h1>
+        <h2
+          style={{
+            fontSize: 96,
+            fontWeight: 700,
+            color: theme.brand,
+            margin: 0,
+            marginTop: 16,
+          }}
+        >
+          支援完了！
+        </h2>
+
+        {/* Payment badges */}
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            flex: 1,
+            gap: 20,
+            marginTop: 40,
+            transform: `scale(${Math.max(0, badgeSpring)})`,
           }}
         >
-          {/* Logo */}
           <div
             style={{
-              transform: `scale(${logoSpring})`,
-              marginBottom: 32,
+              backgroundColor: "#FF0033",
+              color: "white",
+              padding: "16px 32px",
+              borderRadius: 12,
+              fontSize: 32,
+              fontWeight: 700,
             }}
           >
-            <img
-              src={staticFile("tadakayo-logo.jpg")}
-              alt="Tadakayo Logo"
-              style={{
-                width: 200,
-                height: "auto",
-                borderRadius: 16,
-                boxShadow: theme.shadowGlow,
-              }}
-            />
+            PayPay
           </div>
-
-          {/* Title */}
           <div
             style={{
-              opacity: textSpring,
-              transform: `translateY(${(1 - textSpring) * 20}px)`,
-              textAlign: "center",
+              backgroundColor: "#BF0000",
+              color: "white",
+              padding: "16px 32px",
+              borderRadius: 12,
+              fontSize: 32,
+              fontWeight: 700,
             }}
           >
-            <h1
-              style={{
-                fontSize: 64,
-                fontWeight: 700,
-                color: theme.textPrimary,
-                margin: 0,
-                lineHeight: 1.2,
-              }}
-            >
-              QRチャリティ
-            </h1>
-            <h2
-              style={{
-                fontSize: 56,
-                fontWeight: 700,
-                color: theme.brand,
-                margin: 0,
-                marginTop: 8,
-              }}
-            >
-              コネクト
-            </h2>
-          </div>
-
-          {/* Tagline */}
-          <Sequence from={80} durationInFrames={280}>
-            <div
-              style={{
-                marginTop: 32,
-                fontSize: 32,
-                color: theme.textSecondary,
-                textAlign: "center",
-              }}
-            >
-              <Typewriter text="最短2タップで支援完了" charFrames={3} showCursor={false} />
-            </div>
-          </Sequence>
-        </div>
-
-        {/* Right: QR Code */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            flex: 1,
-          }}
-        >
-          {/* QR Code with glow */}
-          <div
-            style={{
-              transform: `scale(${Math.max(0, qrSpring)})`,
-              position: "relative",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                inset: -30,
-                borderRadius: 32,
-                background: theme.brand,
-                opacity: glowOpacity,
-                filter: "blur(30px)",
-              }}
-            />
-            <div
-              style={{
-                width: 320,
-                height: 320,
-                backgroundColor: "white",
-                borderRadius: 20,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
-                border: `4px solid ${theme.brand}`,
-              }}
-            >
-              <div
-                style={{
-                  width: 240,
-                  height: 240,
-                  display: "grid",
-                  gridTemplateColumns: "repeat(7, 1fr)",
-                  gridTemplateRows: "repeat(7, 1fr)",
-                  gap: 4,
-                }}
-              >
-                {QR_PATTERN.map((filled, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      backgroundColor: filled ? theme.bgPrimary : "transparent",
-                      borderRadius: 3,
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Payment badges */}
-          <div
-            style={{
-              display: "flex",
-              gap: 24,
-              marginTop: 40,
-              transform: `scale(${Math.max(0, badgeSpring)})`,
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "#FF0033",
-                color: "white",
-                padding: "14px 28px",
-                borderRadius: 10,
-                fontSize: 24,
-                fontWeight: 700,
-              }}
-            >
-              PayPay
-            </div>
-            <div
-              style={{
-                backgroundColor: "#BF0000",
-                color: "white",
-                padding: "14px 28px",
-                borderRadius: 10,
-                fontSize: 24,
-                fontWeight: 700,
-              }}
-            >
-              楽天ペイ
-            </div>
+            楽天ペイ
           </div>
         </div>
       </div>
+    </AbsoluteFill>
+  );
+};
+
+export const HorizontalVideo: React.FC = () => {
+  return (
+    <AbsoluteFill style={{ backgroundColor: theme.bgPrimary }}>
+      {/* Scene 1: Problem (0-4 sec) */}
+      <Sequence from={0} durationInFrames={120}>
+        <ProblemScene />
+      </Sequence>
+
+      {/* Scene 2: Solution (4-8 sec) */}
+      <Sequence from={120} durationInFrames={120}>
+        <SolutionScene />
+      </Sequence>
+
+      {/* Scene 3: CTA (8-12 sec) */}
+      <Sequence from={240} durationInFrames={120}>
+        <CTAScene />
+      </Sequence>
     </AbsoluteFill>
   );
 };
