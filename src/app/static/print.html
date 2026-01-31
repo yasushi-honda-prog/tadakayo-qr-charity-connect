@@ -183,31 +183,6 @@
             color: var(--primary);
             text-decoration: none;
         }
-        .amounts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        .amount-link {
-            display: block;
-            padding: 16px;
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .amount-link:hover {
-            border-color: var(--primary);
-            background: #fff0f0;
-        }
-        .amount-link.active {
-            border-color: var(--primary);
-            background: #fff0f0;
-        }
         @media (max-width: 360px) {
             .amount-display {
                 font-size: 2rem;
@@ -255,21 +230,10 @@
                 QRコードをダウンロード（PNG）
             </button>
         </div>
-
-        <div style="margin-top: 32px;">
-            <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 16px;">他の金額のQRコードを作成</p>
-            <div class="amounts-grid">
-                <a href="/print/500" class="amount-link" id="link500">500円</a>
-                <a href="/print/1000" class="amount-link" id="link1000">1,000円</a>
-                <a href="/print/3000" class="amount-link" id="link3000">3,000円</a>
-                <a href="/print/5000" class="amount-link" id="link5000">5,000円</a>
-            </div>
-            <a href="/print/donate" class="amount-link" style="display: block;">自由金額（金額選択ページへ）</a>
-        </div>
     </main>
 
     <footer>
-        <p><a href="/donate">← 支援ページに戻る</a></p>
+        <p><a href="/donate">← 管理画面に戻る</a></p>
         <p style="margin-top: 8px;"><a href="https://mmky310.info/" target="_blank">NPO法人タダカヨ</a></p>
     </footer>
 
@@ -296,13 +260,6 @@
 
         // URL表示
         urlDisplay.textContent = payUrl;
-
-        // 現在の金額リンクをハイライト
-        const linkId = `link${amount}`;
-        const activeLink = document.getElementById(linkId);
-        if (activeLink) {
-            activeLink.classList.add('active');
-        }
 
         // QRコード生成（URLのQRコード）
         const qrInstance = new QRCode(qrContainer, {

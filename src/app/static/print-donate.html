@@ -196,27 +196,6 @@
             color: var(--primary);
             text-decoration: none;
         }
-        .amounts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .amount-link {
-            display: block;
-            padding: 16px;
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .amount-link:hover {
-            border-color: var(--primary);
-            background: #fff0f0;
-        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
@@ -262,20 +241,10 @@
                 QRコードをダウンロード（PNG）
             </button>
         </div>
-
-        <div style="margin-top: 32px;">
-            <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 16px;">固定金額のQRコードを作成</p>
-            <div class="amounts-grid">
-                <a href="/print/500" class="amount-link">500円</a>
-                <a href="/print/1000" class="amount-link">1,000円</a>
-                <a href="/print/3000" class="amount-link">3,000円</a>
-                <a href="/print/5000" class="amount-link">5,000円</a>
-            </div>
-        </div>
     </main>
 
     <footer>
-        <p><a href="/donate">← 支援ページに戻る</a></p>
+        <p><a href="/donate">← 管理画面に戻る</a></p>
         <p style="margin-top: 8px;"><a href="https://mmky310.info/" target="_blank">NPO法人タダカヨ</a></p>
     </footer>
 
