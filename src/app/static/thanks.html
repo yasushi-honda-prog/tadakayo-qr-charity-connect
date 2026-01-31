@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ありがとうございます | タダカヨ</title>
+    <title>タダカヨ</title>
     <style>
         :root {
             --primary: #E52D27;
@@ -15,6 +15,8 @@
             --text-light: #666666;
             --border: #e8e8e8;
             --success: #2e7d32;
+            --warning: #f57c00;
+            --error: #d32f2f;
         }
         * {
             margin: 0;
@@ -75,10 +77,9 @@
             padding: 48px 16px;
             text-align: center;
         }
-        .success-icon {
+        .status-icon {
             width: 80px;
             height: 80px;
-            background: var(--success);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -86,6 +87,18 @@
             justify-content: center;
             font-size: 40px;
             margin: 0 auto 24px;
+        }
+        .status-icon.success {
+            background: var(--success);
+        }
+        .status-icon.warning {
+            background: var(--warning);
+        }
+        .status-icon.error {
+            background: var(--error);
+        }
+        .status-icon.loading {
+            background: var(--border);
         }
         h2 {
             font-size: 1.5rem;
@@ -159,6 +172,20 @@
             color: var(--primary);
             text-decoration: none;
         }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -174,31 +201,129 @@
     </header>
 
     <main>
-        <div class="success-icon">&#10003;</div>
-        <h2>ご支援ありがとうございます</h2>
-
-        <img src="/static/assets/tadakayo-character.png" alt="NPO法人タダカヨ" class="hero-image">
-
-        <p class="message">
-            タダカヨへのご支援に心より感謝申し上げます。<br>
-            いただいた支援金は、福祉分野でのICT活用支援に活用させていただきます。
-        </p>
-
-        <div class="card">
-            <h3>タダカヨについて</h3>
-            <p>
-                タダカヨは、福祉現場のICT活用を「タダ」で支援するNPO法人です。
-                研修やツール導入支援を通じて、福祉の現場をより良くする活動を行っています。
-            </p>
+        <!-- ローディング状態 -->
+        <div id="loadingState">
+            <div class="status-icon loading">
+                <div class="spinner"></div>
+            </div>
+            <h2>確認中...</h2>
+            <p class="message">決済状況を確認しています</p>
         </div>
 
-        <a href="https://mmky310.info/" class="btn" target="_blank">タダカヨのサイトへ</a>
-        <br>
-        <a href="/donate" class="btn-secondary">続けて支援する</a>
+        <!-- 決済完了 -->
+        <div id="successState" class="hidden">
+            <div class="status-icon success">&#10003;</div>
+            <h2>ご支援ありがとうございます</h2>
+
+            <img src="/static/assets/tadakayo-character.png" alt="NPO法人タダカヨ" class="hero-image">
+
+            <p class="message">
+                タダカヨへのご支援に心より感謝申し上げます。<br>
+                いただいた支援金は、福祉分野でのICT活用支援に活用させていただきます。
+            </p>
+
+            <div class="card">
+                <h3>タダカヨについて</h3>
+                <p>
+                    タダカヨは、福祉現場のICT活用を「タダ」で支援するNPO法人です。
+                    研修やツール導入支援を通じて、福祉の現場をより良くする活動を行っています。
+                </p>
+            </div>
+
+            <a href="https://mmky310.info/" class="btn" target="_blank">タダカヨのサイトへ</a>
+            <br>
+            <a href="/donate" class="btn-secondary">続けて支援する</a>
+        </div>
+
+        <!-- 決済未完了 -->
+        <div id="incompleteState" class="hidden">
+            <div class="status-icon warning">!</div>
+            <h2>決済が完了していません</h2>
+
+            <p class="message">
+                決済が完了していないか、有効期限が切れた可能性があります。<br>
+                お手数ですが、もう一度お試しください。
+            </p>
+
+            <a href="/donate" class="btn">支援ページに戻る</a>
+        </div>
+
+        <!-- エラー -->
+        <div id="errorState" class="hidden">
+            <div class="status-icon error">&#10005;</div>
+            <h2>エラーが発生しました</h2>
+
+            <p class="message">
+                決済状況の確認中にエラーが発生しました。<br>
+                お手数ですが、もう一度お試しください。
+            </p>
+
+            <a href="/donate" class="btn">支援ページに戻る</a>
+        </div>
     </main>
 
     <footer>
         <p><a href="https://mmky310.info/" target="_blank">NPO法人タダカヨ</a></p>
     </footer>
+
+    <script>
+        // URLパラメータから donation_id を取得
+        // PayPayからのリダイレクト時は merchantPaymentId パラメータで渡される
+        const params = new URLSearchParams(window.location.search);
+        const donationId = params.get('merchantPaymentId') || params.get('donation_id');
+
+        // DOM要素
+        const loadingState = document.getElementById('loadingState');
+        const successState = document.getElementById('successState');
+        const incompleteState = document.getElementById('incompleteState');
+        const errorState = document.getElementById('errorState');
+
+        // 状態表示切替
+        function showState(state) {
+            loadingState.classList.add('hidden');
+            successState.classList.add('hidden');
+            incompleteState.classList.add('hidden');
+            errorState.classList.add('hidden');
+
+            state.classList.remove('hidden');
+        }
+
+        // 決済ステータス確認
+        async function checkPaymentStatus() {
+            // donation_id がない場合は未完了として扱う
+            if (!donationId) {
+                showState(incompleteState);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/donations/${donationId}`);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        // 寄付が見つからない場合は未完了として扱う
+                        showState(incompleteState);
+                        return;
+                    }
+                    throw new Error('API error');
+                }
+
+                const data = await response.json();
+
+                if (data.status === 'completed') {
+                    showState(successState);
+                } else {
+                    // pending, failed, expired, refunded などは未完了として扱う
+                    showState(incompleteState);
+                }
+            } catch (error) {
+                console.error('Error checking payment status:', error);
+                showState(errorState);
+            }
+        }
+
+        // ページ読み込み時に実行
+        document.addEventListener('DOMContentLoaded', checkPaymentStatus);
+    </script>
 </body>
 </html>
