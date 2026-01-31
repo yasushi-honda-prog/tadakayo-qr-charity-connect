@@ -282,14 +282,6 @@
                 <a href="#" class="btn btn-primary" id="directPayLink" target="_blank">
                     PayPayで開く（スマホの場合）
                 </a>
-                <button class="btn btn-secondary" id="downloadBtn">
-                    QRコードをダウンロード
-                </button>
-            </div>
-
-            <div class="direct-link">
-                <p class="direct-link-label">決済URL（コピー用）</p>
-                <a href="#" id="paymentUrl" target="_blank"></a>
             </div>
         </div>
     </main>
@@ -323,8 +315,6 @@
         const qrContainer = document.getElementById('qrCode');
         const expiryTimeEl = document.getElementById('expiryTime');
         const directPayLink = document.getElementById('directPayLink');
-        const paymentUrlEl = document.getElementById('paymentUrl');
-        const downloadBtn = document.getElementById('downloadBtn');
 
         // 初期化
         async function init() {
@@ -391,8 +381,6 @@
 
             // リンク設定
             directPayLink.href = url;
-            paymentUrlEl.href = url;
-            paymentUrlEl.textContent = url;
 
             // 有効期限カウントダウン
             if (expiry) {
@@ -403,8 +391,6 @@
                 startExpiryCountdown(defaultExpiry);
             }
 
-            // ダウンロードボタン
-            downloadBtn.addEventListener('click', downloadQR);
         }
 
         // 有効期限カウントダウン
@@ -427,20 +413,6 @@
 
             updateCountdown();
             expiryTimer = setInterval(updateCountdown, 1000);
-        }
-
-        // QRコードダウンロード
-        function downloadQR() {
-            const canvas = qrContainer.querySelector('canvas');
-            if (!canvas) {
-                alert('QRコードの生成中です。しばらくお待ちください。');
-                return;
-            }
-
-            const link = document.createElement('a');
-            link.download = `tadakayo-support-${amount}yen.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
         }
 
         // エラー表示
