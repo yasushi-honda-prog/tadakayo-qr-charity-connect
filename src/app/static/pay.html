@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPay決済 | タダカヨ</title>
+    <style>
+        :root {
+            --primary: #E52D27;
+            --primary-dark: #c41e1a;
+            --bg: #fff5f5;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e8e8e8;
+            --paypay: #ff0033;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .header-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: white;
+            object-fit: contain;
+        }
+        .header-text h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .pay-badge {
+            display: inline-block;
+            background: #ffebee;
+            color: #c62828;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+            border: 1px solid #ef5350;
+        }
+        main {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 24px 16px;
+            text-align: center;
+        }
+        .amount-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--paypay);
+            margin-bottom: 8px;
+        }
+        .amount-label {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-bottom: 32px;
+        }
+        .qr-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+        #qrCode {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        #qrCode img, #qrCode canvas {
+            border-radius: 12px;
+        }
+        .scan-instruction {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .scan-detail {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        .expiry-section {
+            background: #fff3cd;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .expiry-label {
+            font-size: 0.85rem;
+            color: #856404;
+            margin-bottom: 4px;
+        }
+        .expiry-time {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #856404;
+        }
+        .expiry-time.expired {
+            color: #d32f2f;
+        }
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--paypay);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #cc0029;
+        }
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: #fff0f0;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        footer {
+            text-align: center;
+            padding: 24px 16px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .error-card {
+            background: #ffebee;
+            border: 1px solid #d32f2f;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .error-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+        .error-message {
+            color: #d32f2f;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .error-detail {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px;
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 16px;
+            color: var(--text-light);
+        }
+        .redirect-message {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .redirect-message h3 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+        .redirect-message p {
+            color: #1976d2;
+            font-size: 0.9rem;
+        }
+        .hidden {
+            display: none !important;
+        }
+        @media (max-width: 360px) {
+            .amount-display {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <img src="/static/assets/tadakayo-logo.jpg" alt="タダカヨ" class="header-logo">
+            <div class="header-text">
+                <h1>タダカヨ 支援<span class="pay-badge">決済</span></h1>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- ローディング状態 -->
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p class="loading-text">決済セッションを作成中...</p>
+        </div>
+
+        <!-- モバイルリダイレクト中 -->
+        <div id="redirectState" class="hidden">
+            <div class="redirect-message">
+                <h3>PayPayアプリに移動中...</h3>
+                <p>自動で移動しない場合は下のボタンをタップしてください</p>
+            </div>
+            <div class="amount-display" id="redirectAmountDisplay"></div>
+            <p class="amount-label">の支援</p>
+            <div class="action-buttons">
+                <a href="#" class="btn btn-primary" id="manualPayLink">
+                    PayPayで開く
+                </a>
+            </div>
+        </div>
+
+        <!-- エラー状態 -->
+        <div id="errorState" class="hidden">
+            <div class="error-card">
+                <div class="error-icon">&#9888;</div>
+                <p class="error-message" id="errorMessage">エラーが発生しました</p>
+                <p class="error-detail" id="errorDetail"></p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="location.reload()">再試行</button>
+                <a href="/donate" class="btn btn-secondary">支援ページに戻る</a>
+            </div>
+        </div>
+
+        <!-- PC用QRコード表示 -->
+        <div id="qrState" class="hidden">
+            <div class="amount-display" id="amountDisplay"></div>
+            <p class="amount-label">の支援</p>
+
+            <div class="qr-card">
+                <div id="qrCode"></div>
+                <p class="scan-instruction">PayPayアプリでスキャン</p>
+                <p class="scan-detail">カメラでこのQRコードを読み取ると<br>PayPay決済画面に移動します</p>
+            </div>
+
+            <div class="expiry-section">
+                <p class="expiry-label">有効期限</p>
+                <p class="expiry-time" id="expiryTime"></p>
+            </div>
+
+            <div class="action-buttons">
+                <a href="#" class="btn btn-primary" id="directPayLink">
+                    PayPayで開く（スマホの場合）
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p><a href="/donate">← 支援ページに戻る</a></p>
+        <p style="margin-top: 8px;"><a href="https://mmky310.info/" target="_blank">NPO法人タダカヨ</a></p>
+    </footer>
+
+    <script>
+        // URLから金額を取得
+        const pathParts = window.location.pathname.split('/');
+        const amount = parseInt(pathParts[pathParts.length - 1]);
+
+        // モバイル判定
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // 状態管理
+        let expiryTimer = null;
+        let qrInstance = null;
+
+        // DOM要素
+        const loadingState = document.getElementById('loadingState');
+        const redirectState = document.getElementById('redirectState');
+        const errorState = document.getElementById('errorState');
+        const qrState = document.getElementById('qrState');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorDetail = document.getElementById('errorDetail');
+        const amountDisplay = document.getElementById('amountDisplay');
+        const redirectAmountDisplay = document.getElementById('redirectAmountDisplay');
+        const qrContainer = document.getElementById('qrCode');
+        const expiryTimeEl = document.getElementById('expiryTime');
+        const directPayLink = document.getElementById('directPayLink');
+        const manualPayLink = document.getElementById('manualPayLink');
+
+        // 初期化
+        async function init() {
+            // バリデーション
+            if (!amount || amount < 100 || amount > 1000000) {
+                showError('無効な金額です', '100円〜1,000,000円の範囲で指定してください');
+                return;
+            }
+
+            // 決済セッションを作成
+            try {
+                const baseUrl = window.location.origin;
+                const response = await fetch('/api/donations/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        currency: 'JPY',
+                        source: 'qr_fixed',
+                        provider: 'paypay',
+                        return_url: `${baseUrl}/thanks`,
+                        cancel_url: `${baseUrl}/cancel`,
+                        idempotency_key: crypto.randomUUID()
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail?.message || errorData.detail || 'セッション作成に失敗しました');
+                }
+
+                const data = await response.json();
+
+                // モバイルの場合は自動リダイレクト
+                if (isMobile()) {
+                    showRedirectState(data.redirect_url);
+                    // 少し待ってからリダイレクト（ユーザーに見せるため）
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 500);
+                } else {
+                    // PCの場合はQRコード表示
+                    showQRCode(data.redirect_url, data.expiry_at);
+                }
+            } catch (error) {
+                showError('決済セッションの作成に失敗しました', error.message);
+            }
+        }
+
+        // モバイルリダイレクト状態表示
+        function showRedirectState(url) {
+            loadingState.classList.add('hidden');
+            redirectState.classList.remove('hidden');
+            redirectAmountDisplay.textContent = amount.toLocaleString() + '円';
+            manualPayLink.href = url;
+        }
+
+        // QRコード表示（PC用）
+        function showQRCode(url, expiry) {
+            loadingState.classList.add('hidden');
+            qrState.classList.remove('hidden');
+
+            // 金額表示
+            amountDisplay.textContent = amount.toLocaleString() + '円';
+
+            // QRコード生成
+            qrInstance = new QRCode(qrContainer, {
+                text: url,
+                width: 240,
+                height: 240,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            // リンク設定
+            directPayLink.href = url;
+
+            // 有効期限カウントダウン
+            if (expiry) {
+                startExpiryCountdown(new Date(expiry));
+            } else {
+                // デフォルトで5分後
+                const defaultExpiry = new Date(Date.now() + 5 * 60 * 1000);
+                startExpiryCountdown(defaultExpiry);
+            }
+        }
+
+        // 有効期限カウントダウン
+        function startExpiryCountdown(expiryDate) {
+            function updateCountdown() {
+                const now = new Date();
+                const diff = expiryDate - now;
+
+                if (diff <= 0) {
+                    expiryTimeEl.textContent = '有効期限切れ';
+                    expiryTimeEl.classList.add('expired');
+                    clearInterval(expiryTimer);
+                    return;
+                }
+
+                const minutes = Math.floor(diff / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                expiryTimeEl.textContent = `残り ${minutes}分 ${seconds.toString().padStart(2, '0')}秒`;
+            }
+
+            updateCountdown();
+            expiryTimer = setInterval(updateCountdown, 1000);
+        }
+
+        // エラー表示
+        function showError(message, detail) {
+            loadingState.classList.add('hidden');
+            errorState.classList.remove('hidden');
+            errorMessage.textContent = message;
+            errorDetail.textContent = detail || '';
+        }
+
+        // 初期化実行
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
