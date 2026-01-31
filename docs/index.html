@@ -1618,41 +1618,50 @@ gitGraph
                 </div>
 
                 <h3>テストに必要なもの</h3>
-                <div class="alert alert-info" style="margin-bottom: 20px;">
-                    <span class="alert-icon">🔒</span>
-                    <div class="alert-content">
-                        <h4>開発者専用環境</h4>
-                        <p>以下のツールは<strong>PayPay for Developers加盟店の開発者ダッシュボード</strong>からのみ入手可能です（一般公開されていません）。</p>
-                    </div>
-                </div>
                 <div class="card-grid">
                     <div class="feature-card">
-                        <h4>1️⃣ PayPay Sandboxアプリ</h4>
-                        <p>通常のPayPayアプリとは別の、開発者向け専用テストアプリです。</p>
+                        <h4>1️⃣ PayPayアプリ（通常版）</h4>
+                        <p>App Store / Google Play からダウンロードした通常のPayPayアプリを使用します。</p>
                         <ul style="margin-top: 12px; padding-left: 20px; font-size: 0.9rem;">
-                            <li>開発者ダッシュボードからリンク取得</li>
-                            <li>iOS: TestFlight経由</li>
-                            <li>Android: APKダウンロード</li>
+                            <li><a href="https://apps.apple.com/jp/app/id1435783608?mt=8" target="_blank" style="color: var(--accent-blue);">iOS (App Store)</a></li>
+                            <li><a href="https://play.google.com/store/apps/details?id=jp.ne.paypay.android.app&hl=ja" target="_blank" style="color: var(--accent-blue);">Android (Google Play)</a></li>
                         </ul>
                     </div>
                     <div class="feature-card">
                         <h4>2️⃣ テストユーザーアカウント</h4>
                         <p>開発者ダッシュボードで発行されるテスト用アカウントです。</p>
                         <ul style="margin-top: 12px; padding-left: 20px; font-size: 0.9rem;">
-                            <li>仮想残高（¥100,000）が設定済み</li>
+                            <li><a href="https://developer.paypay.ne.jp/dashboard/home" target="_blank" style="color: var(--accent-blue);">PayPay Developer Dashboard</a></li>
+                            <li>仮想残高が設定済み</li>
                             <li>実際の決済は発生しません</li>
                         </ul>
                     </div>
                 </div>
 
-                <h3>テスト手順（加盟店開発者向け）</h3>
+                <h3>PayPayアプリをSandboxモードに切り替える手順</h3>
                 <div class="card">
                     <ol>
-                        <li>PayPay for Developersの<strong>開発者ダッシュボード</strong>にログイン</li>
-                        <li><strong>PayPay Sandboxアプリ</strong>のダウンロードリンクを取得してインストール</li>
-                        <li>Sandboxアプリで<strong>テストユーザーアカウント</strong>にログイン</li>
-                        <li><a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: var(--accent-blue);">デモ版支援ページ</a>で金額を選択しQRコードを表示</li>
-                        <li>Sandboxアプリで<strong>QRコードをスキャン</strong></li>
+                        <li>PayPayアプリを起動し、<strong>新規登録／ログイン画面</strong>を表示</li>
+                        <li>画面上部の<strong>PayPayロゴを7回タップ</strong></li>
+                        <li>表示されたダイアログで<strong>「開発モードでログイン」</strong>ボタンを押下</li>
+                        <li>Sandboxアプリのサインイン画面が表示される</li>
+                        <li><a href="https://developer.paypay.ne.jp/dashboard/home" target="_blank" style="color: var(--accent-blue);">開発者ダッシュボード</a>に表示されている<strong>テストユーザー</strong>の情報を入力</li>
+                        <li>認証コード確認画面が表示された場合は<strong>「1234」</strong>を入力</li>
+                    </ol>
+                    <div class="alert alert-info" style="margin-top: 16px;">
+                        <span class="alert-icon">📝</span>
+                        <div class="alert-content">
+                            <p style="margin: 0;"><strong>注意:</strong> Sandboxモードではアプリ通知／SMS通知は届きません。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>決済テスト手順</h3>
+                <div class="card">
+                    <ol>
+                        <li>上記の手順でPayPayアプリを<strong>Sandboxモード</strong>に切り替え、テストユーザーでログイン</li>
+                        <li><a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: var(--accent-blue);">デモ版支援ページ</a>で金額を選択</li>
+                        <li>表示されたQRコードを<strong>Sandboxモードのアプリでスキャン</strong></li>
                         <li>決済を実行 → サンクスページが表示されれば成功</li>
                     </ol>
                 </div>
