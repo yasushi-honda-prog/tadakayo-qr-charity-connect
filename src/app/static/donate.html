@@ -475,6 +475,11 @@
         const customPcBtn = document.getElementById('customPcBtn');
         const customMobileBtn = document.getElementById('customMobileBtn');
 
+        // ページ読み込み時にローディングを非表示（ブラウザバック対策）
+        window.addEventListener('pageshow', () => {
+            loadingOverlay.classList.remove('show');
+        });
+
         // 固定金額のモバイルボタン
         document.querySelectorAll('.action-btn.mobile[data-amount]').forEach(btn => {
             btn.addEventListener('click', async (e) => {
