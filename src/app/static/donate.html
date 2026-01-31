@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRコードで支援 | タダカヨ</title>
+    <title>管理ダッシュボード | タダカヨ QR決済</title>
     <style>
         :root {
             --primary: #E52D27;
             --primary-dark: #c41e1a;
-            --secondary: #1a1a1a;
-            --bg: #fff5f5;
+            --bg: #f5f5f5;
             --card-bg: #ffffff;
             --text: #1a1a1a;
             --text-light: #666666;
-            --border: #e8e8e8;
-            --error: #d32f2f;
-            --success: #2e7d32;
-            --paypay: #ff0033;
+            --border: #e0e0e0;
+            --print: #2e7d32;
+            --print-bg: #e8f5e9;
+            --pc: #1565c0;
+            --pc-bg: #e3f2fd;
+            --mobile: #ff0033;
+            --mobile-bg: #ffebee;
         }
         * {
             margin: 0;
@@ -27,13 +29,13 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
             background: var(--bg);
             color: var(--text);
-            line-height: 1.7;
+            line-height: 1.6;
             min-height: 100vh;
         }
         header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, #424242 0%, #212121 100%);
             color: white;
-            padding: 20px 16px;
+            padding: 16px;
             text-align: center;
         }
         .header-content {
@@ -43,283 +45,217 @@
             gap: 12px;
         }
         .header-logo {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 8px;
             background: white;
             object-fit: contain;
         }
         .header-text h1 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
         }
-        .header-text p {
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
-        .demo-badge {
+        .admin-badge {
             display: inline-block;
-            background: #fff3cd;
-            color: #856404;
-            font-size: 0.7rem;
+            background: #ff9800;
+            color: white;
+            font-size: 0.65rem;
             font-weight: 600;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 20px;
-            margin-top: 8px;
-            border: 1px solid #ffc107;
-        }
-        .demo-notice {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 24px;
-            text-align: left;
-        }
-        .demo-notice-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            color: #856404;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-        }
-        .demo-notice-text {
-            font-size: 0.85rem;
-            color: #856404;
-            line-height: 1.6;
+            margin-left: 8px;
         }
         main {
-            max-width: 480px;
+            max-width: 600px;
             margin: 0 auto;
             padding: 24px 16px;
         }
-        .hero-section {
-            text-align: center;
+        .dashboard-info {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+            border-radius: 12px;
+            padding: 16px;
             margin-bottom: 24px;
         }
-        .hero-image {
-            max-width: 200px;
-            width: 100%;
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-        .hero-text {
-            font-size: 0.95rem;
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text);
-        }
-        .section-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-bottom: 16px;
-            line-height: 1.6;
-        }
-        /* QRコード金額選択（メインコンテンツ） */
-        .qr-main-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 32px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .qr-main-section .section-title {
+        .dashboard-info h2 {
+            font-size: 1rem;
+            color: #e65100;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .qr-icon {
-            font-size: 1.3rem;
+        .dashboard-info p {
+            font-size: 0.85rem;
+            color: #bf360c;
+            line-height: 1.6;
         }
-        .qr-amount-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+        .sandbox-notice {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
         }
-        .qr-amount-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            border: 2px solid var(--paypay);
-            border-radius: 16px;
-            padding: 20px 16px;
-            text-decoration: none;
+        .sandbox-notice h3 {
+            font-size: 0.9rem;
             color: var(--text);
-            transition: all 0.2s;
+            margin-bottom: 8px;
         }
-        .qr-amount-btn:hover {
-            background: var(--paypay);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 0, 51, 0.3);
-        }
-        .qr-amount-btn .amount {
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-        .qr-amount-btn .label {
+        .sandbox-notice p {
             font-size: 0.8rem;
             color: var(--text-light);
-            margin-top: 4px;
+            line-height: 1.6;
         }
-        .qr-amount-btn:hover .label {
-            color: rgba(255, 255, 255, 0.9);
+        .sandbox-notice code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
         }
-        .qr-flow {
+        .legend {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 20px;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
             padding: 12px;
-            background: #f8f8f8;
+            background: var(--card-bg);
             border-radius: 8px;
-            font-size: 0.85rem;
-            color: var(--text-light);
         }
-        .qr-flow-step {
+        .legend-item {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            font-size: 0.8rem;
         }
-        .qr-flow-arrow {
-            color: var(--paypay);
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
         }
-        /* カスタム金額セクション（サブ） */
-        .custom-section {
-            border-top: 1px solid var(--border);
-            padding-top: 32px;
-            margin-top: 16px;
+        .legend-dot.print { background: var(--print); }
+        .legend-dot.pc { background: var(--pc); }
+        .legend-dot.mobile { background: var(--mobile); }
+        .amount-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        .custom-section-header {
+        .amount-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            cursor: pointer;
-            padding: 8px 0;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
         }
-        .custom-section-header h2 {
+        .amount-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .amount-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .action-btn .icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        .action-btn.print {
+            background: var(--print-bg);
+            color: var(--print);
+            border-color: var(--print);
+        }
+        .action-btn.pc {
+            background: var(--pc-bg);
+            color: var(--pc);
+            border-color: var(--pc);
+        }
+        .action-btn.mobile {
+            background: var(--mobile-bg);
+            color: var(--mobile);
+            border-color: var(--mobile);
+        }
+        .custom-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .custom-section h3 {
             font-size: 1rem;
-            color: var(--text-light);
+            margin-bottom: 16px;
+            color: var(--text);
         }
-        .toggle-icon {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            transition: transform 0.3s;
-        }
-        .custom-section.open .toggle-icon {
-            transform: rotate(180deg);
-        }
-        .custom-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .custom-section.open .custom-content {
-            max-height: 400px;
-        }
-        .custom-amount {
-            margin-bottom: 24px;
-        }
-        .custom-amount label {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-bottom: 8px;
+        .custom-input-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
         }
         .custom-input-wrapper {
+            flex: 1;
             display: flex;
             align-items: center;
-            background: var(--card-bg);
+            background: #f5f5f5;
             border: 2px solid var(--border);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 4px;
-            transition: border-color 0.2s;
         }
         .custom-input-wrapper:focus-within {
             border-color: var(--primary);
         }
-        .custom-input-wrapper.selected {
-            border-color: var(--primary);
-            background: #fff0f0;
-        }
-        .custom-amount input {
+        .custom-input-wrapper input {
             flex: 1;
             border: none;
             background: transparent;
-            padding: 12px;
-            font-size: 1.1rem;
+            padding: 10px;
+            font-size: 1rem;
             font-weight: 600;
-            color: var(--text);
             outline: none;
-            width: 100%;
         }
-        .custom-amount input::placeholder {
-            color: var(--text-light);
-            font-weight: 400;
-        }
-        .currency-label {
-            padding: 0 16px;
-            font-size: 1rem;
+        .custom-input-wrapper .unit {
+            padding: 0 12px;
             color: var(--text-light);
         }
-        .provider-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .custom-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
         }
-        .provider-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 16px 24px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+        footer {
+            text-align: center;
+            padding: 24px 16px;
+            color: var(--text-light);
+            font-size: 0.8rem;
         }
-        .provider-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .provider-btn.paypay {
-            background: #ff0033;
-            color: white;
-        }
-        .provider-btn.paypay:hover:not(:disabled) {
-            background: #cc0029;
-        }
-        .provider-btn.rakuten {
-            background: #bf0000;
-            color: white;
-        }
-        .provider-btn.rakuten:hover:not(:disabled) {
-            background: #990000;
-        }
-        .error-message {
-            background: #ffebee;
-            border: 1px solid var(--error);
-            color: var(--error);
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-            display: none;
-        }
-        .error-message.show {
-            display: block;
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
         }
         .loading-overlay {
             position: fixed;
@@ -328,12 +264,11 @@
             right: 0;
             bottom: 0;
             background: rgba(255, 255, 255, 0.9);
-            display: flex;
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            display: none;
         }
         .loading-overlay.show {
             display: flex;
@@ -351,134 +286,177 @@
         }
         .loading-text {
             margin-top: 16px;
-            font-size: 1rem;
             color: var(--text);
         }
-        footer {
-            text-align: center;
-            padding: 24px 16px;
-            color: var(--text-light);
-            font-size: 0.85rem;
-        }
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-        @media (max-width: 360px) {
-            .qr-amount-btn .amount {
-                font-size: 1.2rem;
+        @media (max-width: 400px) {
+            .action-grid, .custom-actions {
+                grid-template-columns: 1fr;
+            }
+            .action-btn {
+                flex-direction: row;
+                justify-content: center;
+                gap: 8px;
+            }
+            .action-btn .icon {
+                margin-bottom: 0;
             }
         }
     </style>
-
 </head>
 <body>
     <header>
         <div class="header-content">
             <img src="/static/assets/tadakayo-logo.jpg" alt="タダカヨ" class="header-logo">
             <div class="header-text">
-                <h1>タダカヨ</h1>
-                <p>タダでカイゴをヨくしよう！</p>
-                <span class="demo-badge">デモ版</span>
+                <h1>タダカヨ QR決済<span class="admin-badge">管理画面</span></h1>
             </div>
         </div>
     </header>
 
     <main>
-        <div class="hero-section">
-            <img src="/static/assets/tadakayo-character.png" alt="NPO法人タダカヨ - 介護×IT" class="hero-image">
-            <p class="hero-text">
-                福祉現場のICT活用を<br>「タダ」で支援するNPO法人です
+        <div class="dashboard-info">
+            <h2>🛠️ 管理ダッシュボード</h2>
+            <p>
+                このページは開発・テスト用の管理画面です。<br>
+                本番運用時は、印刷用QRコードを配布し、支援者は直接決済ページにアクセスします。
             </p>
         </div>
 
-        <div class="demo-notice">
-            <div class="demo-notice-title">
-                ⚠️ デモ版（Sandbox テスト環境）
-            </div>
-            <div class="demo-notice-text">
-                <strong>Sandboxモードでテストできます</strong><br><br>
-                <strong>テスト方法：</strong><br>
+        <div class="sandbox-notice">
+            <h3>📱 PayPay Sandbox テスト方法</h3>
+            <p>
                 1. 通常のPayPayアプリをインストール<br>
                 2. PayPayロゴを<strong>7回タップ</strong>してSandboxモードを有効化<br>
-                3. テストユーザーでログイン（認証コード: <strong>1234</strong>）<br><br>
-                <span style="font-size: 0.8rem; opacity: 0.9;">※ 正式版公開後は通常モードで決済可能になります</span>
+                3. テストユーザーでログイン（認証コード: <code>1234</code>）
+            </p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-dot print"></span>
+                <span>印刷用（永久有効）</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot pc"></span>
+                <span>PC用（QR表示）</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot mobile"></span>
+                <span>モバイル用（直接決済）</span>
             </div>
         </div>
 
-        <!-- メイン：QRコード金額選択 -->
-        <section class="qr-main-section">
-            <h2 class="section-title">
-                <span class="qr-icon">📱</span>
-                QRコードで支援
-            </h2>
-            <p class="section-subtitle">
-                金額を選んでQRコードを発行。<br>
-                PayPayアプリでスキャンするだけで支援完了！
-            </p>
-            <div class="qr-amount-grid">
-                <a href="/pay/500" class="qr-amount-btn">
-                    <span class="amount">500円</span>
-                    <span class="label">PayPayで支援</span>
+        <!-- 500円 -->
+        <div class="amount-card">
+            <div class="amount-header">
+                <span class="amount-value">500円</span>
+                <span class="amount-label">支援</span>
+            </div>
+            <div class="action-grid">
+                <a href="/print/500" class="action-btn print">
+                    <span class="icon">🖨️</span>
+                    <span>印刷用QR</span>
                 </a>
-                <a href="/pay/1000" class="qr-amount-btn">
-                    <span class="amount">1,000円</span>
-                    <span class="label">PayPayで支援</span>
+                <a href="/pay/500" class="action-btn pc">
+                    <span class="icon">🖥️</span>
+                    <span>PC用</span>
                 </a>
-                <a href="/pay/3000" class="qr-amount-btn">
-                    <span class="amount">3,000円</span>
-                    <span class="label">PayPayで支援</span>
-                </a>
-                <a href="/pay/5000" class="qr-amount-btn">
-                    <span class="amount">5,000円</span>
-                    <span class="label">PayPayで支援</span>
+                <a href="#" class="action-btn mobile" data-amount="500">
+                    <span class="icon">📱</span>
+                    <span>モバイル</span>
                 </a>
             </div>
-            <div class="qr-flow">
-                <span class="qr-flow-step">金額選択</span>
-                <span class="qr-flow-arrow">→</span>
-                <span class="qr-flow-step">PayPay決済</span>
-                <span class="qr-flow-arrow">→</span>
-                <span class="qr-flow-step">完了</span>
-            </div>
-        </section>
+        </div>
 
-        <!-- サブ：任意金額での支援 -->
-        <section class="custom-section" id="customSection">
-            <div class="custom-section-header" onclick="toggleCustomSection()">
-                <h2>任意の金額で支援する</h2>
-                <span class="toggle-icon">▼</span>
+        <!-- 1,000円 -->
+        <div class="amount-card">
+            <div class="amount-header">
+                <span class="amount-value">1,000円</span>
+                <span class="amount-label">支援</span>
             </div>
-            <div class="custom-content">
-                <div id="errorMessage" class="error-message"></div>
+            <div class="action-grid">
+                <a href="/print/1000" class="action-btn print">
+                    <span class="icon">🖨️</span>
+                    <span>印刷用QR</span>
+                </a>
+                <a href="/pay/1000" class="action-btn pc">
+                    <span class="icon">🖥️</span>
+                    <span>PC用</span>
+                </a>
+                <a href="#" class="action-btn mobile" data-amount="1000">
+                    <span class="icon">📱</span>
+                    <span>モバイル</span>
+                </a>
+            </div>
+        </div>
 
-                <div class="custom-amount" style="margin-top: 16px;">
-                    <label for="customAmount">金額を入力（100円〜1,000,000円）</label>
-                    <div class="custom-input-wrapper" id="customWrapper">
-                        <input type="number" id="customAmount" min="100" max="1000000" step="100" placeholder="例: 2000">
-                        <span class="currency-label">円</span>
-                    </div>
+        <!-- 3,000円 -->
+        <div class="amount-card">
+            <div class="amount-header">
+                <span class="amount-value">3,000円</span>
+                <span class="amount-label">支援</span>
+            </div>
+            <div class="action-grid">
+                <a href="/print/3000" class="action-btn print">
+                    <span class="icon">🖨️</span>
+                    <span>印刷用QR</span>
+                </a>
+                <a href="/pay/3000" class="action-btn pc">
+                    <span class="icon">🖥️</span>
+                    <span>PC用</span>
+                </a>
+                <a href="#" class="action-btn mobile" data-amount="3000">
+                    <span class="icon">📱</span>
+                    <span>モバイル</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 5,000円 -->
+        <div class="amount-card">
+            <div class="amount-header">
+                <span class="amount-value">5,000円</span>
+                <span class="amount-label">支援</span>
+            </div>
+            <div class="action-grid">
+                <a href="/print/5000" class="action-btn print">
+                    <span class="icon">🖨️</span>
+                    <span>印刷用QR</span>
+                </a>
+                <a href="/pay/5000" class="action-btn pc">
+                    <span class="icon">🖥️</span>
+                    <span>PC用</span>
+                </a>
+                <a href="#" class="action-btn mobile" data-amount="5000">
+                    <span class="icon">📱</span>
+                    <span>モバイル</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 自由金額 -->
+        <div class="custom-section">
+            <h3>自由金額</h3>
+            <div class="custom-input-row">
+                <div class="custom-input-wrapper">
+                    <input type="number" id="customAmount" min="100" max="1000000" step="100" placeholder="金額を入力">
+                    <span class="unit">円</span>
                 </div>
-
-                <div class="provider-btns">
-                    <button class="provider-btn paypay" data-provider="paypay">
-                        PayPayで支援する
-                    </button>
-                    <button class="provider-btn rakuten" data-provider="rakuten" disabled title="楽天ペイは準備中です">
-                        楽天ペイで支援する（準備中）
-                    </button>
-                </div>
             </div>
-        </section>
-
-        <!-- 印刷用QRコード生成リンク -->
-        <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
-            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 12px;">
-                🖨️ チラシ・名刺用のQRコードを作成
-            </p>
-            <a href="/print/500" style="display: inline-block; padding: 12px 24px; background: #e8f5e9; color: #2e7d32; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
-                印刷用QRコードを作成
-            </a>
+            <div class="custom-actions">
+                <a href="/print/donate" class="action-btn print">
+                    <span class="icon">🖨️</span>
+                    <span>印刷用QR</span>
+                </a>
+                <button type="button" class="action-btn pc" id="customPcBtn">
+                    <span class="icon">🖥️</span>
+                    <span>PC用</span>
+                </button>
+                <button type="button" class="action-btn mobile" id="customMobileBtn">
+                    <span class="icon">📱</span>
+                    <span>モバイル</span>
+                </button>
+            </div>
         </div>
     </main>
 
@@ -492,77 +470,59 @@
     </div>
 
     <script>
-        // カスタムセクションの開閉
-        function toggleCustomSection() {
-            const section = document.getElementById('customSection');
-            section.classList.toggle('open');
-        }
-
-        // 状態管理
-        let selectedAmount = null;
-
-        // DOM要素
-        const customInput = document.getElementById('customAmount');
-        const customWrapper = document.getElementById('customWrapper');
-        const providerBtns = document.querySelectorAll('.provider-btn');
-        const errorMessage = document.getElementById('errorMessage');
         const loadingOverlay = document.getElementById('loadingOverlay');
+        const customAmountInput = document.getElementById('customAmount');
+        const customPcBtn = document.getElementById('customPcBtn');
+        const customMobileBtn = document.getElementById('customMobileBtn');
 
-        // URLパラメータからsourceを取得（未指定時はdirect）
-        const params = new URLSearchParams(window.location.search);
-        const source = params.get('source') || 'direct';
-
-        // 金額入力のハンドラ
-        customInput.addEventListener('input', () => {
-            const value = parseInt(customInput.value);
-
-            if (value && value >= 100 && value <= 1000000) {
-                customWrapper.classList.add('selected');
-                selectedAmount = value;
-                hideError();
-            } else {
-                customWrapper.classList.remove('selected');
-                selectedAmount = null;
-            }
-        });
-
-        // 決済プロバイダボタンのクリックハンドラ
-        providerBtns.forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const provider = btn.dataset.provider;
-                await createCheckout(provider);
+        // 固定金額のモバイルボタン
+        document.querySelectorAll('.action-btn.mobile[data-amount]').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const amount = parseInt(btn.dataset.amount);
+                await createCheckoutAndRedirect(amount);
             });
         });
 
-        // 決済セッション作成
-        async function createCheckout(provider) {
-            // バリデーション
-            if (!selectedAmount) {
-                showError('金額を選択してください');
-                return;
+        // 自由金額のPC用ボタン
+        customPcBtn.addEventListener('click', () => {
+            const amount = parseInt(customAmountInput.value);
+            if (validateAmount(amount)) {
+                window.location.href = `/pay/${amount}`;
             }
+        });
 
-            if (selectedAmount < 100 || selectedAmount > 1000000) {
-                showError('金額は100円から1,000,000円の範囲で入力してください');
-                return;
+        // 自由金額のモバイル用ボタン
+        customMobileBtn.addEventListener('click', async () => {
+            const amount = parseInt(customAmountInput.value);
+            if (validateAmount(amount)) {
+                await createCheckoutAndRedirect(amount);
             }
+        });
 
-            // ローディング表示
-            showLoading();
-            hideError();
+        // 金額バリデーション
+        function validateAmount(amount) {
+            if (!amount || amount < 100 || amount > 1000000) {
+                alert('金額は100円〜1,000,000円の範囲で入力してください');
+                return false;
+            }
+            return true;
+        }
+
+        // 決済セッション作成してリダイレクト
+        async function createCheckoutAndRedirect(amount) {
+            loadingOverlay.classList.add('show');
 
             try {
                 const baseUrl = window.location.origin;
                 const response = await fetch('/api/donations/checkout', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: selectedAmount,
+                        amount: amount,
                         currency: 'JPY',
-                        source: source,
-                        provider: provider,
+                        source: 'admin_dashboard',
+                        provider: 'paypay',
                         return_url: `${baseUrl}/thanks`,
                         cancel_url: `${baseUrl}/cancel`,
                         idempotency_key: crypto.randomUUID()
@@ -575,36 +535,12 @@
                 }
 
                 const data = await response.json();
-
-                // 決済画面へリダイレクト
                 window.location.href = data.redirect_url;
             } catch (error) {
-                hideLoading();
-                showError(error.message || '通信エラーが発生しました。再度お試しください。');
+                loadingOverlay.classList.remove('show');
+                alert(error.message || '通信エラーが発生しました');
             }
         }
-
-        // エラー表示
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.add('show');
-        }
-
-        function hideError() {
-            errorMessage.classList.remove('show');
-        }
-
-        // ローディング表示
-        function showLoading() {
-            loadingOverlay.classList.add('show');
-            providerBtns.forEach(btn => btn.disabled = true);
-        }
-
-        function hideLoading() {
-            loadingOverlay.classList.remove('show');
-            providerBtns.forEach(btn => btn.disabled = false);
-        }
-
     </script>
 </body>
 </html>

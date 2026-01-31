@@ -1109,15 +1109,15 @@
                 <div class="card-grid">
                     <div class="feature-card">
                         <h4>📱 QRコード→即決済</h4>
-                        <p>金額付きQRコードをスキャン→PayPayで即決済。最短2タップで支援完了。</p>
+                        <p>印刷物のQRをスキャン→モバイルなら自動でPayPayへ。最短2タップで支援完了。</p>
                     </div>
                     <div class="feature-card">
-                        <h4>🎯 固定金額QRコード</h4>
-                        <p>500円/1,000円/3,000円/5,000円のQRコードを発行。チラシ・名刺に最適。</p>
+                        <h4>🖨️ 永久有効の印刷用QR</h4>
+                        <p>500円/1,000円/3,000円/5,000円の印刷用QRを発行。有効期限なし。</p>
                     </div>
                     <div class="feature-card">
-                        <h4>📊 流入元トラッキング</h4>
-                        <p>チラシ・名刺・イベントごとの効果測定で、マーケティング改善に活用。</p>
+                        <h4>🖥️ PC/モバイル自動判定</h4>
+                        <p>PCアクセス時は5分有効QRを表示、モバイルは自動でPayPayへリダイレクト。</p>
                     </div>
                     <div class="feature-card">
                         <h4>💰 低コスト運用</h4>
@@ -1203,28 +1203,31 @@ graph TB
                     <div class="section-icon">🔄</div>
                     <h2>支援フロー（シーケンス図）</h2>
                 </div>
-                <p>ユーザーがQRコードをスキャンしてから支援決済が完了するまでの流れです。</p>
+                <p>ユーザーが印刷物のQRコードをスキャンしてから支援決済が完了するまでの流れです。</p>
 
+                <h3>固定金額QRコード（印刷物）の場合</h3>
                 <div class="mermaid">
 sequenceDiagram
     autonumber
     participant U as ユーザー
-    participant QR as QRコード
+    participant QR as 印刷QR
     participant CR as Cloud Run
     participant SM as Secret Manager
     participant FS as Firestore
-    participant PP as PayPay/楽天ペイ
+    participant PP as PayPay
 
     U->>QR: QRコードをスキャン
-    QR->>CR: GET /donate?source=flyer_001
-    CR->>FS: 流入元を記録
-    CR->>U: 金額選択ページを表示
-    U->>CR: 金額を選択 (例: 1,000円)
+    QR->>CR: GET /pay/1000
     CR->>SM: APIキーを取得
     SM-->>CR: APIキー
     CR->>PP: 決済リクエスト作成
     PP-->>CR: 決済URL
-    CR->>U: 決済画面へリダイレクト
+    alt モバイルアクセス
+        CR->>U: PayPayへ自動リダイレクト
+    else PCアクセス
+        CR->>U: PayPayQRコードを表示（5分有効）
+        U->>PP: QRをスキャン
+    end
     U->>PP: 決済を実行
     PP-->>U: 決済完了
     PP->>CR: Webhook通知
@@ -1512,12 +1515,48 @@ gitGraph
                         <h4>デモ版公開中（開発者向けテスト環境）</h4>
                         <p>PayPay Sandbox接続済み。<strong>通常のPayPayアプリでは利用できません。</strong><br>
                         テストにはPayPay Sandboxアプリ＋テストユーザーが必要です（<a href="#demo-test" style="color: var(--accent-yellow);">詳細</a>）。<br>
-                        <span style="font-size: 0.85rem; opacity: 0.8;">最新更新（2026/01/25）: UIをQRコード決済中心に刷新</span></p>
-                        <div style="margin-top: 12px; display: flex; gap: 16px;">
-                            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: var(--accent-yellow); font-weight: 600;">支援ページ →</a>
-                            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/qr/500" target="_blank" style="color: var(--accent-yellow); font-weight: 600;">500円QRコード →</a>
+                        <span style="font-size: 0.85rem; opacity: 0.8;">最新更新（2026/02/01）: 管理画面と印刷用/決済用ページを明確に分離</span></p>
+                        <div style="margin-top: 12px; display: flex; gap: 16px; flex-wrap: wrap;">
+                            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: var(--accent-yellow); font-weight: 600;">管理画面 →</a>
+                            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/print/500" target="_blank" style="color: var(--accent-yellow); font-weight: 600;">印刷用QR（500円）→</a>
+                            <a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/pay/500" target="_blank" style="color: var(--accent-yellow); font-weight: 600;">決済ページ（500円）→</a>
                         </div>
                     </div>
+                </div>
+
+                <h3>ページ構成</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ページ</th>
+                                <th>URL</th>
+                                <th>用途</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>管理画面</strong></td>
+                                <td><code>/donate</code></td>
+                                <td>開発者向け。各金額の印刷用/PC用/モバイル用ボタンを提供</td>
+                            </tr>
+                            <tr>
+                                <td><strong>印刷用QR（固定金額）</strong></td>
+                                <td><code>/print/{amount}</code></td>
+                                <td>永久有効。チラシ・名刺用QRコードを生成・ダウンロード</td>
+                            </tr>
+                            <tr>
+                                <td><strong>印刷用QR（自由金額）</strong></td>
+                                <td><code>/print/donate</code></td>
+                                <td>永久有効。金額選択ページへのQRコードを生成</td>
+                            </tr>
+                            <tr>
+                                <td><strong>決済ページ</strong></td>
+                                <td><code>/pay/{amount}</code></td>
+                                <td>印刷QRのリンク先。モバイル→自動決済、PC→5分有効QR表示</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <h3>マイルストーン詳細</h3>
@@ -1660,10 +1699,17 @@ gitGraph
                 <div class="card">
                     <ol>
                         <li>上記の手順でPayPayアプリを<strong>Sandboxモード</strong>に切り替え、テストユーザーでログイン</li>
-                        <li><a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: var(--accent-blue);">デモ版支援ページ</a>で金額を選択</li>
+                        <li><a href="https://qr-payment-api-sandbox-yggvw3tpqa-an.a.run.app/donate" target="_blank" style="color: var(--accent-blue);">管理画面</a>にアクセス</li>
+                        <li>テストしたい金額の<strong>「PC用」</strong>ボタンをクリック（PC用QRコードが表示される）</li>
                         <li>表示されたQRコードを<strong>Sandboxモードのアプリでスキャン</strong></li>
                         <li>決済を実行 → サンクスページが表示されれば成功</li>
                     </ol>
+                    <div class="alert alert-info" style="margin-top: 16px;">
+                        <span class="alert-icon">💡</span>
+                        <div class="alert-content">
+                            <p style="margin: 0;"><strong>ヒント:</strong> 「印刷用」ボタンは永久有効なQRコード（URLへのQR）を生成します。「モバイル」ボタンはPayPayへ直接リダイレクトします。</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="alert alert-info">
