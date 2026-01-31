@@ -394,15 +394,15 @@
 
         <div class="demo-notice">
             <div class="demo-notice-title">
-                ⚠️ デモ版（開発者向けテスト環境）
+                ⚠️ デモ版（Sandbox テスト環境）
             </div>
             <div class="demo-notice-text">
-                <strong>通常のPayPayアプリでは決済できません。</strong><br><br>
-                このページはPayPay Sandbox（テスト環境）に接続しています。
-                テストには以下が必要です：<br>
-                ・PayPay Sandboxアプリ（開発者ダッシュボードから入手）<br>
-                ・テストユーザーアカウント<br><br>
-                <span style="font-size: 0.8rem; opacity: 0.9;">※ 正式版公開後は通常のPayPayアプリで決済可能になります</span>
+                <strong>Sandboxモードでテストできます</strong><br><br>
+                <strong>テスト方法：</strong><br>
+                1. 通常のPayPayアプリをインストール<br>
+                2. PayPayロゴを<strong>7回タップ</strong>してSandboxモードを有効化<br>
+                3. テストユーザーでログイン（認証コード: <strong>1234</strong>）<br><br>
+                <span style="font-size: 0.8rem; opacity: 0.9;">※ 正式版公開後は通常モードで決済可能になります</span>
             </div>
         </div>
 
@@ -417,29 +417,27 @@
                 PayPayアプリでスキャンするだけで支援完了！
             </p>
             <div class="qr-amount-grid">
-                <a href="/qr/500" class="qr-amount-btn">
+                <a href="/pay/500" class="qr-amount-btn">
                     <span class="amount">500円</span>
-                    <span class="label">QRコードを発行</span>
+                    <span class="label">PayPayで支援</span>
                 </a>
-                <a href="/qr/1000" class="qr-amount-btn">
+                <a href="/pay/1000" class="qr-amount-btn">
                     <span class="amount">1,000円</span>
-                    <span class="label">QRコードを発行</span>
+                    <span class="label">PayPayで支援</span>
                 </a>
-                <a href="/qr/3000" class="qr-amount-btn">
+                <a href="/pay/3000" class="qr-amount-btn">
                     <span class="amount">3,000円</span>
-                    <span class="label">QRコードを発行</span>
+                    <span class="label">PayPayで支援</span>
                 </a>
-                <a href="/qr/5000" class="qr-amount-btn">
+                <a href="/pay/5000" class="qr-amount-btn">
                     <span class="amount">5,000円</span>
-                    <span class="label">QRコードを発行</span>
+                    <span class="label">PayPayで支援</span>
                 </a>
             </div>
             <div class="qr-flow">
                 <span class="qr-flow-step">金額選択</span>
                 <span class="qr-flow-arrow">→</span>
-                <span class="qr-flow-step">QR表示</span>
-                <span class="qr-flow-arrow">→</span>
-                <span class="qr-flow-step">PayPayスキャン</span>
+                <span class="qr-flow-step">PayPay決済</span>
                 <span class="qr-flow-arrow">→</span>
                 <span class="qr-flow-step">完了</span>
             </div>
