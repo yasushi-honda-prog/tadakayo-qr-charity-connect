@@ -148,12 +148,30 @@ async def mock_payment_page(order_id: str) -> FileResponse:
     )
 
 
-@app.get("/qr/{amount}", response_model=None)
-async def qr_payment_page(amount: int) -> Response:
-    """Serve the QR payment page for a fixed amount.
+# =============================================================================
+# 印刷用QRコード生成ページ（永久有効）
+# =============================================================================
 
-    The page will create a PayPay checkout session and display
-    the payment URL as a QR code.
+
+@app.get("/print/donate")
+async def print_donate_page() -> FileResponse:
+    """Serve the print QR page for free amount selection.
+
+    This page generates a QR code pointing to /donate.
+    The QR code never expires and can be printed on flyers, business cards, etc.
+    """
+    return FileResponse(
+        STATIC_DIR / "print-donate.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
+
+
+@app.get("/print/{amount}", response_model=None)
+async def print_qr_page(amount: int) -> Response:
+    """Serve the print QR generation page for a fixed amount.
+
+    This page generates a QR code pointing to /pay/{amount}.
+    The QR code never expires and can be printed on flyers, business cards, etc.
 
     Args:
         amount: The donation amount in JPY (100-1,000,000)
@@ -167,9 +185,68 @@ async def qr_payment_page(amount: int) -> Response:
             },
         )
     return FileResponse(
-        STATIC_DIR / "qr-payment.html",
+        STATIC_DIR / "print.html",
         headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
     )
+
+
+# =============================================================================
+# 決済実行ページ（5分有効、モバイル自動リダイレクト）
+# =============================================================================
+
+
+@app.get("/pay/{amount}", response_model=None)
+async def pay_page(amount: int) -> Response:
+    """Serve the payment execution page for a fixed amount.
+
+    - Mobile: Automatically redirects to PayPay
+    - PC: Displays PayPay QR code with 5-minute expiry countdown
+
+    This is the page that printed QR codes should point to.
+
+    Args:
+        amount: The donation amount in JPY (100-1,000,000)
+    """
+    if amount < 100 or amount > 1000000:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "INVALID_AMOUNT",
+                "message": "金額は100円〜1,000,000円の範囲で指定してください",
+            },
+        )
+    return FileResponse(
+        STATIC_DIR / "pay.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
+
+
+# =============================================================================
+# 旧エンドポイント（後方互換性のため維持、/pay へリダイレクト推奨）
+# =============================================================================
+
+
+@app.get("/qr/{amount}", response_model=None)
+async def qr_payment_page(amount: int) -> Response:
+    """Legacy endpoint - redirects to /pay/{amount}.
+
+    This endpoint is kept for backward compatibility.
+    New implementations should use /pay/{amount} instead.
+
+    Args:
+        amount: The donation amount in JPY (100-1,000,000)
+    """
+    from starlette.responses import RedirectResponse
+
+    if amount < 100 or amount > 1000000:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "INVALID_AMOUNT",
+                "message": "金額は100円〜1,000,000円の範囲で指定してください",
+            },
+        )
+    return RedirectResponse(url=f"/pay/{amount}", status_code=302)
 
 
 @app.get("/favicon.ico", include_in_schema=False)
