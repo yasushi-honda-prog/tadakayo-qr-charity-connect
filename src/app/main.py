@@ -108,19 +108,28 @@ if STATIC_DIR.exists():
 @app.get("/donate")
 async def donate_page() -> FileResponse:
     """Serve the donation amount selection page."""
-    return FileResponse(STATIC_DIR / "donate.html")
+    return FileResponse(
+        STATIC_DIR / "donate.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
 
 
 @app.get("/thanks")
 async def thanks_page() -> FileResponse:
     """Serve the thank you page."""
-    return FileResponse(STATIC_DIR / "thanks.html")
+    return FileResponse(
+        STATIC_DIR / "thanks.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
 
 
 @app.get("/cancel")
 async def cancel_page() -> FileResponse:
     """Serve the cancellation page."""
-    return FileResponse(STATIC_DIR / "cancel.html")
+    return FileResponse(
+        STATIC_DIR / "cancel.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
 
 
 @app.get("/mock/payment/{order_id}")
@@ -133,7 +142,10 @@ async def mock_payment_page(order_id: str) -> FileResponse:
     Args:
         order_id: The mock order ID from the checkout session
     """
-    return FileResponse(STATIC_DIR / "mock-payment.html")
+    return FileResponse(
+        STATIC_DIR / "mock-payment.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
 
 
 @app.get("/qr/{amount}", response_model=None)
@@ -154,7 +166,10 @@ async def qr_payment_page(amount: int) -> Response:
                 "message": "金額は100円〜1,000,000円の範囲で指定してください",
             },
         )
-    return FileResponse(STATIC_DIR / "qr-payment.html")
+    return FileResponse(
+        STATIC_DIR / "qr-payment.html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
 
 
 @app.get("/favicon.ico", include_in_schema=False)
