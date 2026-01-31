@@ -157,6 +157,15 @@ async def qr_payment_page(amount: int) -> Response:
     return FileResponse(STATIC_DIR / "qr-payment.html")
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon() -> FileResponse:
+    """Serve favicon."""
+    return FileResponse(
+        STATIC_DIR / "assets" / "tadakayo-logo.jpg",
+        media_type="image/jpeg",
+    )
+
+
 @app.get("/health")
 async def health_check() -> dict[str, str]:
     """Health check endpoint for Cloud Run."""
