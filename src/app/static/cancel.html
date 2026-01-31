@@ -169,19 +169,26 @@
 
     <main>
         <div class="cancel-icon">!</div>
-        <h2>決済が完了していません</h2>
+        <h2>このページに遷移しました</h2>
 
-        <p class="message">
-            決済が完了していないか、有効期限が切れた可能性があります。<br>
-            お手数ですが、もう一度お試しください。
-        </p>
+        <div class="sandbox-note" style="background: #e3f2fd; border-color: #2196f3; margin-bottom: 24px;">
+            <strong style="color: #1565c0;">テスター向け情報</strong><br>
+            <small style="color: #0d47a1;">
+                <strong>PayPayアプリで決済完了したのにこのページが表示された場合：</strong><br>
+                Sandbox環境ではリダイレクトが正常に動作しないことがあります。<br>
+                <strong>決済自体は成功している可能性があります。</strong><br>
+                PayPayアプリの履歴で決済が完了しているか確認してください。
+            </small>
+        </div>
 
         <div class="sandbox-note">
-            <strong>Sandbox環境での決済テスト</strong><br>
+            <strong>Sandbox環境でのテスト方法</strong><br>
             <small>
-                PayPayアプリでロゴを7回タップ →<br>
-                Sandboxモードでテストユーザーログイン<br>
-                （認証コード: 1234）
+                1. PayPayアプリでロゴを<strong>7回タップ</strong><br>
+                2. 「開発モードでログイン」を選択<br>
+                3. テストユーザーでログイン（認証コード: <strong>1234</strong>）<br>
+                <br>
+                ※ 通常のPayPayアカウントでは決済できません
             </small>
         </div>
 

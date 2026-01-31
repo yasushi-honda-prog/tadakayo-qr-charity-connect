@@ -213,39 +213,39 @@
         <!-- 決済完了 -->
         <div id="successState" class="hidden">
             <div class="status-icon success">&#10003;</div>
-            <h2>ご支援ありがとうございます</h2>
+            <h2>決済が完了しました</h2>
 
-            <img src="/static/assets/tadakayo-character.png" alt="NPO法人タダカヨ" class="hero-image">
+            <div class="card" style="background: #e8f5e9; border: 1px solid #4caf50; text-align: center;">
+                <p style="color: #2e7d32; margin: 0;">
+                    <strong>テスト決済が正常に処理されました</strong><br>
+                    <small>Sandbox環境のため、実際の課金は発生していません</small>
+                </p>
+            </div>
 
             <p class="message">
                 タダカヨへのご支援に心より感謝申し上げます。<br>
                 いただいた支援金は、福祉分野でのICT活用支援に活用させていただきます。
             </p>
 
-            <div class="card">
-                <h3>タダカヨについて</h3>
-                <p>
-                    タダカヨは、福祉現場のICT活用を「タダ」で支援するNPO法人です。
-                    研修やツール導入支援を通じて、福祉の現場をより良くする活動を行っています。
-                </p>
-            </div>
-
-            <a href="https://mmky310.info/" class="btn" target="_blank">タダカヨのサイトへ</a>
-            <br>
-            <a href="/donate" class="btn-secondary">続けて支援する</a>
+            <a href="/donate" class="btn">管理画面に戻る</a>
         </div>
 
         <!-- 決済未完了 -->
         <div id="incompleteState" class="hidden">
             <div class="status-icon warning">!</div>
-            <h2>決済が完了していません</h2>
+            <h2>決済状況を確認できません</h2>
 
-            <p class="message">
-                決済が完了していないか、有効期限が切れた可能性があります。<br>
-                お手数ですが、もう一度お試しください。
-            </p>
+            <div class="card" style="background: #fff3e0; border: 1px solid #ff9800; text-align: left;">
+                <p style="color: #e65100; margin: 0; font-size: 0.9rem;">
+                    <strong>テスター向け情報</strong><br>
+                    <small style="color: #bf360c;">
+                        PayPayアプリで決済完了していれば、決済自体は成功しています。<br>
+                        Sandbox環境ではリダイレクトパラメータが正しく渡されないことがあります。
+                    </small>
+                </p>
+            </div>
 
-            <a href="/donate" class="btn">支援ページに戻る</a>
+            <a href="/donate" class="btn">管理画面に戻る</a>
         </div>
 
         <!-- エラー -->
