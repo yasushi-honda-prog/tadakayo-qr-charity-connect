@@ -444,10 +444,10 @@
                 </div>
             </div>
             <div class="custom-actions">
-                <a href="/print/donate" class="action-btn print">
+                <button type="button" class="action-btn print" id="customPrintBtn">
                     <span class="icon">🖨️</span>
                     <span>印刷用QR</span>
-                </a>
+                </button>
                 <button type="button" class="action-btn pc" id="customPcBtn">
                     <span class="icon">🖥️</span>
                     <span>PC用</span>
@@ -472,6 +472,7 @@
     <script>
         const loadingOverlay = document.getElementById('loadingOverlay');
         const customAmountInput = document.getElementById('customAmount');
+        const customPrintBtn = document.getElementById('customPrintBtn');
         const customPcBtn = document.getElementById('customPcBtn');
         const customMobileBtn = document.getElementById('customMobileBtn');
 
@@ -487,6 +488,14 @@
                 const amount = parseInt(btn.dataset.amount);
                 await createCheckoutAndRedirect(amount);
             });
+        });
+
+        // 自由金額の印刷用ボタン
+        customPrintBtn.addEventListener('click', () => {
+            const amount = parseInt(customAmountInput.value);
+            if (validateAmount(amount)) {
+                window.location.href = `/print/${amount}`;
+            }
         });
 
         // 自由金額のPC用ボタン
